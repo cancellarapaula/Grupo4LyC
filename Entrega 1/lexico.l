@@ -2,10 +2,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <string.h>
 
+#define NO_ENCONTRADO -1
+typedef struct{
+		char nombre[100];
+		char tipo;		
+		char valor[100];
+		int longitud;
+		
+		} registro;
+
+msj_error(char* mensaje);
 FILE  *yyin;
 int yylval;
 char *yyltext;
+registro tabla[100];
+int indice=0;
 
 %}
 %option noyywrap  
@@ -13,9 +26,11 @@ char *yyltext;
 
 
 DIGITO			[0-9]
+HEXA			[A-F]
+BIN			[0-1]
 LETRA			[a-zA-Z]
-CONST_REAL              {DIGITO}+"."{DIGITO}+
-CONST_INT               {DIGITO}+
+CTE_REAL                {DIGITO}+"."{DIGITO}+
+CTE_INT              	{DIGITO}+
 ID			{LETRA}({LETRA}|{DIGITO})*
 OP_ASIG   		":="
 OP_COMPARACION          "<"|"=="|">"|"<="|">="|"!="
@@ -27,12 +42,11 @@ P_A                     ["("]
 P_C                     [")"]
 LL_A                    ["{"]
 LL_C                    ["}"]
-COMENT_A                "*-"
-COMENT_C                "-*"
+COMENT		        \*-.*\-*
 COMA			[","]
 P_Y_C			[";"]
 ESPACIO			[" "]
-STRING 			\".*\"
+CTE_STRING 		\".*\"
 PUT			"PUT"
 GET			"GET"
 INTEGER			"Integer"
@@ -41,6 +55,8 @@ WHILE 			"while"
 IF			"if"
 ELSE			"Else"
 CONST			"CONST"
+CTE_BIN			{BIN}+
+CTE_HEXA		{DIGITO|HEXA}+
 %%
 
 {PUT}			printf("\nPalabra reservada: %s\n",yytext);
@@ -62,13 +78,14 @@ CONST			"CONST"
 {P_C}			printf("\nParentesis que cierra: %s\n",yytext);
 {LL_A}			printf("\nLlave que abre: %s\n",yytext);
 {LL_C}			printf("\nLlave que cierra: %s\n",yytext);
-{COMENT_A}		printf("\nComentario que abre: %s\n",yytext);
-{COMENT_C}		printf("\nComentario que cierra: %s\n",yytext);
+{COMENT}		printf("\nComentario: %s\n",yytext);
 {OP_COMPARACION}	printf("\nOperacion de comparacion: %s\n",yytext);
 {ID}			printf("\nIdentificador: %s\n",yytext);
-{CONST_INT}		printf("\nConstante entera: %s\n",yytext);
-{CONST_REAL}		printf("\nConstante real: %s\n",yytext);
-{STRING}		printf("\nString: %s\n", yytext);
+{CTE_INT}		printf("\nConstante entera: %s\n",yytext);
+{CTE_REAL}		printf("\nConstante real: %s\n",yytext);
+{CTE_STRING}		printf( "String: %s\n", yytext); 
+				
+			
 
 
 \n
@@ -93,3 +110,17 @@ int yyerror(void)
 	  system("Pause");
           exit (1);
 	}
+
+
+
+
+
+
+
+
+int msj_error(char* mensaje)
+{
+	printf("Error lexico: %s\n", mensaje);
+	system ("Pause");
+	exit (1);
+}
