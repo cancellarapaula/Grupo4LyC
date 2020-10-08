@@ -20,6 +20,12 @@ char *yyltext;
 registro tabla[100];
 int indice=0;
 
+unsigned long long binarioADecimal(char *cadenaBinaria, int longitud);
+unsigned long long hexaADecimal(char *cadenaHexa, int longitud);
+void quitarPrefijo(char *cadena, char * nuevaCadena, int longitud);
+unsigned long long hexadecimalADecimal(char *cadenaHexadecimal, int longitud);
+int caracterHexadecimalADecimal(char caracter);
+
 %}
 %option noyywrap  
 %option yylineno 
@@ -175,10 +181,23 @@ AS		"AS"
 				}
 {CTE_HEXA}		{
 				printf("\nConstante hexa: %s\n",yytext);
+				int longitud = strlen(yytext);
+				char hexa[longitud-2];
+				quitarPrefijo(yytext,hexa,longitud);
+				longitud =  strlen(hexa);
+				unsigned long long decimal = hexadecimalADecimal(yytext,longitud);
+				insertar_TS();
 				return CTE_HEXA;
 				}
 {CTE_BIN}		{
 				printf( "\nConstante binaria: %s\n", yytext); 
+				
+				int longitud = strlen(yytext);
+				char binario2[longitud-2];
+				quitarPrefijo(yytext,binario2,longitud);
+				longitud =  strlen(binario2);
+				unsigned long long decimal = binarioADecimal(binario2,longitud);
+				insertar_TS();
 				return CTE_BIN;
 				}
 
@@ -214,3 +233,49 @@ int yyerror(void)
 	  system("Pause");
           exit (1);
 	}
+
+unsigned long long binarioADecimal(char *cadenaBinaria, int longitud) {
+  unsigned long long decimal = 0;
+  int multiplicador = 1;
+  char caracterActual;
+  for (int i = longitud - 1; i >= 0; i--) {
+    caracterActual = cadenaBinaria[i];
+    if (caracterActual == '1') {
+      decimal += multiplicador;
+    }
+    multiplicador = multiplicador * 2;
+  }
+  return decimal;
+}
+
+void quitarPrefijo(char *cadena, char *nuevaCadena, int longitud) {
+	int j=0;
+    int i;
+	for(i=2;i<=longitud-1;i++){
+
+		nuevaCadena[j]=cadena[i];
+		j++;
+	}
+	nuevaCadena[j]='\0';
+
+}
+
+int caracterHexadecimalADecimal(char caracter) {
+  if (isdigit(caracter))
+    return caracter - '0';
+  return 10 + (toupper(caracter) - 'A');
+}
+
+unsigned long long hexadecimalADecimal(char *cadenaHexadecimal, int longitud) {
+  unsigned long long decimal = 0;
+  int potencia = 0;
+  for (int i = longitud - 1; i >= 0; i--) {
+    
+    int valorActual = caracterHexadecimalADecimal(cadenaHexadecimal[i]);
+    unsigned long long elevado = pow(16, potencia) * valorActual;
+  
+    decimal += elevado;
+    potencia++;
+  }
+  return decimal;
+}
