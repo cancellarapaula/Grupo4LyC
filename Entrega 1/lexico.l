@@ -20,11 +20,12 @@ char *yyltext;
 registro tabla[100];
 int indice=0;
 
-unsigned long long binarioADecimal(char *cadenaBinaria, int longitud);
-unsigned long long hexaADecimal(char *cadenaHexa, int longitud);
-void quitarPrefijo(char *cadena, char * nuevaCadena, int longitud);
-unsigned long long hexadecimalADecimal(char *cadenaHexadecimal, int longitud);
-int caracterHexadecimalADecimal(char caracter);
+unsigned long long binarioADecimal(char *, int );
+unsigned long long hexaADecimal(char *, int );
+void quitarPrefijo(char *, char * , int);
+unsigned long long hexadecimalADecimal(char *, int );
+int caracterHexadecimalADecimal(char );
+void mensajeDeError(int );
 
 %}
 %option noyywrap  
@@ -167,37 +168,79 @@ AS		"AS"
 				printf("\nIdentificador: %s\n",yytext);
 				return ID;
 				}
+				
 {CTE_INT}		{
 				printf("\nConstante entera: %s\n",yytext);
+				if(atoll(yytext)<=32767)
+				{
+					int length = strlen(yytext);
+					char cte_nombre[length];
+					strcpy(cte_nombre, "_");
+					strcat(cte_nombre, yytext);
+				}
+				else
+				{
+				mensajeDeError(1);
+				}
+				
 				return CTE_INT;
 				}
 {CTE_REAL}		{
 				printf("\nConstante real: %s\n",yytext);
+				if(atof(yytext)<=3.40282347e+38F)
+				{
+				int length = strlen(yytext);
+				char cte_nombre[length];
+				strcpy(cte_nombre, "_");
+				strcat(cte_nombre, yytext);
+				}
+				else{
+				void mensajeDeError(2);
+				}
 				return CTE_REAL;
 				}
 {CTE_STRING}	{
 				printf( "\nString: %s\n", yytext); 
+				if(strlen(yytext)<=30){
+
+				int length = strlen(yytext);
+				char cte_nombre[length];
+				strcpy(cte_nombre, "_");
+				strcat(cte_nombre, yytext);
+					
+					return CTE_STRING;
+				}
+				else{
+					void mensajeDeError(3);
+				}
 				return CTE_STRING;
 				}
 {CTE_HEXA}		{
 				printf("\nConstante hexa: %s\n",yytext);
+				int length = strlen(yytext);
+				char cte_nombre[length];
+				strcpy(cte_nombre, "_");
+				strcat(cte_nombre, yytext);
+				
 				int longitud = strlen(yytext);
 				char hexa[longitud-2];
 				quitarPrefijo(yytext,hexa,longitud);
 				longitud =  strlen(hexa);
 				unsigned long long decimal = hexadecimalADecimal(yytext,longitud);
-				insertar_TS();
 				return CTE_HEXA;
 				}
 {CTE_BIN}		{
 				printf( "\nConstante binaria: %s\n", yytext); 
+				int length = strlen(yytext);
+				char cte_nombre[length];
+				strcpy(cte_nombre, "_");
+				strcat(cte_nombre, yytext);
 				
 				int longitud = strlen(yytext);
 				char binario2[longitud-2];
 				quitarPrefijo(yytext,binario2,longitud);
 				longitud =  strlen(binario2);
 				unsigned long long decimal = binarioADecimal(binario2,longitud);
-				insertar_TS();
 				return CTE_BIN;
 				}
 
@@ -278,4 +321,26 @@ unsigned long long hexadecimalADecimal(char *cadenaHexadecimal, int longitud) {
     potencia++;
   }
   return decimal;
+}
+void mensajeDeError(int error){
+
+	switch(error){
+
+        case 1:
+            printf("ERROR LEXICO. Descripcion: Int fuera de rango. Debe ser un int de 16bits.\n");
+            break ;
+
+		case 2:
+            printf("ERROR LEXICO. Descripcion: Float fuera de rango. Debe ser un float de 32bits.\n");
+            break ;
+
+        case 3:
+            printf("ERROR LEXICO. Descripcion: String fuera de rango. La longitud maxima es de 30 caracteres.\n");
+            break ;
+
+        }
+
+    system ("Pause");
+	exit (1);
+	
 }

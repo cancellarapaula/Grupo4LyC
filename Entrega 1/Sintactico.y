@@ -14,7 +14,6 @@ FILE  *yyin;
 
 %token P_Y_C
 %token COMA
-%token COMENT
 %token P_A 
 %token P_C
 %token LL_A
@@ -25,13 +24,13 @@ FILE  *yyin;
 %token OP_DIVI
 %token OP_ASIG
 %token OP_COMPARACION
-%token OP_ASIG 
 %token OP_LOGICO
 %token OP_NEGACION
 %token CTE_INT
 %token CTE_REAL
 %token CTE_BIN
 %token CTE_HEXA
+%token CTE_STRING
 %token IF 
 %token ELSE	
 %token ESPACIO
@@ -64,13 +63,13 @@ declaraciones:
 
 declaracion:  
   FLOAT DOSPUNTOS lista_var
-  |INT DOSPUNTOS lista_var
+  |INTEGER DOSPUNTOS lista_var
   |STRING DOSPUNTOS lista_var
 ;
 
 lista_var:  
   ID
-  |lista_var PUNTOCOMA ID  
+  |lista_var P_Y_C ID  
 ;
 
 algoritmo: 
@@ -112,7 +111,7 @@ condicion:
 expresion:
 	termino
 	|expresion OP_SUMA termino
-	|expresion OP_RESTA termino
+	|expresion OP_REST termino
 ;
 
 termino: 
@@ -131,7 +130,7 @@ factor:
 ;
 
 salida:
-	PUT CONST_STRING 
+	PUT CTE_STRING 
 	|PUT ID
 ;
 
