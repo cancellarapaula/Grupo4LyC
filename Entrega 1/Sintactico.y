@@ -174,11 +174,11 @@ int main(int argc,char *argv[])
 
   if ((yyin = fopen(argv[1], "rt")) == NULL)
   {
-	printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
+	  printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
   }
   else
   {
-	yyparse();
+	  yyparse();
   }
   fclose(yyin);
   return 0;
@@ -186,7 +186,7 @@ int main(int argc,char *argv[])
 int yyerror(void)
      {
        printf("Syntax Error\n");
-	 system ("Pause");
-	 exit (1);
+       system ("Pause");
+       exit (1);
      }
 

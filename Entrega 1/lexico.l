@@ -288,7 +288,7 @@ AS				"AS"
 				return OP_LOGICO;
 			}
 
-{COMENT}
+{COMENT} 
 
 \n
 \t
