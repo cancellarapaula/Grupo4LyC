@@ -57,112 +57,112 @@ programa:
 ;  
 
 bloque_declaracion:         	        	
-  bloque_declaracion declaracion
-  |declaracion
+  bloque_declaracion declaracion {printf("regla BLOQUE_DECLARACION es declaracion\n");}
+  |declaracion {printf("regla BLOQUE_DECLARACION es declaracion\n");}
 ;
 
 declaracion:  
-  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR
+  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR {printf("regla DECLARACION;\n");}
 ;
 
 lista_var:  
-  lista_var COMA ID
-  |ID
+  lista_var COMA ID {printf("regla LISTA_VAR es lista_var, ID\n");}
+  |ID {printf("regla LISTA_VAR es id\n");}
 ;
 
 lista_tipos:
-  lista_tipos COMA tipo_dato
-  |tipo_dato
+  lista_tipos COMA tipo_dato {printf("regla LISTA_TIPOS es lista_tipos,tipo_dato \n");}
+  |tipo_dato {printf("regla LISTA_TIPOS es tipo_dato\n");}
   ;
 
 tipo_dato:
-  INTEGER
-  |FLOAT
+  INTEGER {printf("regla TIPO_DATO es integer\n");}
+  |FLOAT {printf("regla TIPO_DATO es foat\n");}
 ;
 
 bloque: 
-  bloque sentencia
-  |sentencia
+  bloque sentencia {printf("regla BLOQUE es bloque sentencia\n");}
+  |sentencia {printf("regla BLOQUE es sentencia\n");}
 ;
 
 sentencia:
-  ciclo
-  |if  
-  |asignacion
-  |salida
-  |entrada
+  ciclo {printf("regla SENTENCIA es ciclo\n");}
+  |if  {printf("regla SENTENCIA es if\n");}
+  |asignacion {printf("regla SENTENCIA es asignacion\n");}
+  |salida {printf("regla SENTENCIA es salida\n");}
+  |entrada {printf("regla SENTENCIA es entrada\n");}
 ;
 
 ciclo:
-	WHILE P_A decision P_C LL_A bloque LL_C 
+	WHILE P_A decision P_C LL_A bloque LL_C {printf("regla CICLO es while(decision){bloque}\n");}
 ;
 
 asignacion: 
-	ID OP_ASIG expresion P_Y_C
+	ID OP_ASIG expresion P_Y_C {printf("regla ASIGNACION es id:=expresion;\n");}
 ;
 
 if: 
-	IF P_A decision P_C LL_A bloque LL_C 
-	|IF P_A decision P_C LL_A bloque LL_C ELSE LL_A bloque LL_C
+	IF P_A decision P_C LL_A bloque LL_C {printf("regla IF es if(decision){bloque}\n");}
+	|IF P_A decision P_C LL_A bloque LL_C ELSE LL_A bloque LL_C {printf("regla IF es if(decision){bloque} else {bloque}\n");}
 ;
 
 decision:
-  decision OP_LOGICO condicion
-  |condicion
+  decision OP_LOGICO condicion {printf("regla DECISION ES decision op_logico condicion\n");}
+  |condicion {printf("regla DECISION es condicion\n");}
 ;
 
 condicion:
-  OP_NEGACION condicion
-  |expresion comparador expresion
+  OP_NEGACION condicion {printf("regla CONDICION es not condicion\n");}
+  |expresion comparador expresion {printf("regla CONDICION es expresion comparador expresion\n");}
 ;
 
 comparador:
-  OP_IGUAL
-  |OP_DISTINTO
-  |OP_MENORIGUAL
-  |OP_MAYORIGUAL
-  |OP_MAYOR
-  |OP_MENOR
+  OP_IGUAL {printf("regla COMPARADOR ES =\n");}
+  |OP_DISTINTO {printf("regla COMPARADOR ES <>\n");}
+  |OP_MENORIGUAL {printf("regla COMPARADOR ES <=\n");}
+  |OP_MAYORIGUAL {printf("regla COMPARADOR ES >=\n");}
+  |OP_MAYOR {printf("regla COMPARADOR ES >\n");}
+  |OP_MENOR {printf("regla COMPARADOR ES <\n");}
 ;
 
 expresion:
-  expresion OP_SUMA termino
-	|expresion OP_REST termino
-  |termino
+  expresion OP_SUMA termino {printf("regla EXPRESION es expresion+termino\n");}
+	|expresion OP_REST termino {printf("regla EXPRESION es expresion-termino\n");}
+  |termino {printf("regla TERMINO es termino\n");}
 ;
 
 termino: 
-  termino OP_MULT factor 
-	|termino OP_DIVI factor 
-  |factor
+  termino OP_MULT factor {printf("regla TERMINO es termino*factor\n");}
+	|termino OP_DIVI factor {printf("regla TERMINO es termino/factor\n");}
+  |factor {printf("regla FACTOR es factor\n");}
 ;
 
 factor:
-  P_A expresion P_C
-  |maximo
-	|ID
-	|CTE_STRING
-	|CTE_INT
-	|CTE_REAL
-	|CTE_BIN
-	|CTE_HEXA
+  P_A expresion P_C {printf("regla FACTOR es (expresion)\n");}
+  |maximo {printf("regla FACTOR es maximo\n");}
+	|ID {printf("regla FACTOR es id\n");}
+	|CTE_STRING {printf("regla FACTOR es cte_string\n");}
+	|CTE_INT {printf("regla FACTOR es cte_int\n");}
+	|CTE_REAL {printf("regla FACTOR es cte_real\n");}
+	|CTE_BIN {printf("regla FACTOR es cte_bin\n");}
+	|CTE_HEXA {printf("regla FACTOR es cte_hexa\n");}
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C
+  MAXIMO P_A lista_expresion P_C {printf("regla MAXIMO es maximo(lista_expresion)\n");}
 ;
 
 lista_expresion:
-  lista_expresion COMA expresion
-  | expresion
+  lista_expresion COMA expresion {printf("regla LISTA_EXPRESION es lista_expresion,expresion\n");}
+  | expresion {printf("regla LISTA_EXPRESION es expresion\n");}
 ;
 
 salida:
-	PUT CTE_STRING P_Y_C
-	|PUT ID P_Y_C
+	PUT CTE_STRING P_Y_C {printf("regla SALIDA es PUT cte_string;\n");}
+	|PUT ID P_Y_C {printf("regla SALIDA es PUT id;\n");}
 ;
 
 entrada:
-  GET ID P_Y_C
+  GET ID P_Y_C {printf("regla ENTRADA es GET id;\n");}
 ;
 
 %%
