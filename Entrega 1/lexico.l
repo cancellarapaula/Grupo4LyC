@@ -1,3 +1,21 @@
+/**
+ * 
+ *  UNLaM
+ *  Lenguajes y Compiladores ( 2020 2C )
+ *
+ *  Grupo 4. Integrantes:
+ *	  Rapetti, Pablo.
+ *    Gomez Nespola, Daiana.
+ *    De Donato, Jonathan.
+ *    Cancellara, Paula.
+ *    Ávila, Martin.      
+ *
+ *  Temas especiales: 
+ *     1-Constante Binaria y Hexadecimal
+ *	   2-Máximo
+ *
+ */
+ 
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,21 +23,6 @@
 #include <string.h>
 #include <math.h>
 #include "y.tab.h"
-
-typedef struct{
-		char nombre[100];
-		char tipo;		
-		char valor[100];
-		int longitud;
-		
-		} simbolos;
-
-
-FILE  *yyin;
-int yylval;
-char *yyltext;
-//registro tabla[100];
-int indice=0;
 
 unsigned long long binarioADecimal(char *, int );
 unsigned long long hexaADecimal(char *, int );
@@ -72,6 +75,7 @@ GET				"GET"
 
 INTEGER			"Integer"
 FLOAT			"Float"
+STRING 			"String"
 
 WHILE 			"while"
 IF				"if"
@@ -85,208 +89,200 @@ AS				"AS"
 %%
 
 {PUT}			{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return PUT;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return PUT;
 				}
 {GET}			{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return GET;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return GET;
 				}
 {INTEGER}		{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return INTEGER;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return INTEGER;
 				}
 {FLOAT}			{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return FLOAT;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return FLOAT;
+				}
+{STRING}		{
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return STRING;
 				}
 {IF}			{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return IF;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return IF;
 				}
 {ELSE}   		{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return ELSE;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return ELSE;
 				}
 {WHILE}	  		{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return WHILE;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return WHILE;
 				}
 {MAXIMO}		{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return MAXIMO;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return MAXIMO;
 				}
 {DIM}			{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return DIM;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return DIM;
 				}
 {AS}			{
-				printf("\nPalabra reservada: %s\n",yytext);
-				return AS;
+					//printf("\nPalabra reservada: %s\n",yytext);
+					return AS;
 				}
 {OP_ASIG}		{
-				printf("\nAsignacion: %s\n",yytext);
-				return OP_ASIG;
+					//printf("\nAsignacion: %s\n",yytext);
+					return OP_ASIG;
 				}
 {OP_NEGACION}	{
-				printf("\nNegacion: %s\n",yytext);
-				return OP_NEGACION;
+					//printf("\nNegacion: %s\n",yytext);
+					return OP_NEGACION;
 				}
 {OP_SUMA}		{
-				printf("\nSuma: %s\n",yytext);
-				return OP_SUMA;
+					//printf("\nSuma: %s\n",yytext);
+					return OP_SUMA;
 				}
 {OP_REST}		{
-				printf("\nResta: %s\n",yytext);
-				return OP_REST;
+					//printf("\nResta: %s\n",yytext);
+					return OP_REST;
 				}
 {OP_MULT}		{
-				printf("\nMultiplicacion: %s\n",yytext);
-				return OP_MULT;
+					//printf("\nMultiplicacion: %s\n",yytext);
+					return OP_MULT;
 				}
 {OP_DIVI}		{
-				printf("\nDivision: %s\n",yytext);
-				return OP_DIVI;
+					//printf("\nDivision: %s\n",yytext);
+					return OP_DIVI;
 				}
 {COMA}			{
-				printf("\nComa: %s\n",yytext);
-				return COMA;
+					//printf("\nComa: %s\n",yytext);
+					return COMA;
 				}
 {P_Y_C}			{
-				printf("\nPunto y coma: %s\n",yytext);
-				return P_Y_C;
+					//printf("\nPunto y coma: %s\n",yytext);
+					return P_Y_C;
 				}
 {P_A}			{
-				printf("\nParentesis que abre: %s\n",yytext);
-				return P_A;
+					//printf("\nParentesis que abre: %s\n",yytext);
+					return P_A;
 				}
 {P_C}			{
-				printf("\nParentesis que cierra: %s\n",yytext);
-				return P_C;
+					//printf("\nParentesis que cierra: %s\n",yytext);
+					return P_C;
 				}
 {LL_A}			{
-				printf("\nLlave que abre: %s\n",yytext);
-				return LL_A;
+					//printf("\nLlave que abre: %s\n",yytext);
+					return LL_A;
 				}
 {LL_C}			{
-				printf("\nLlave que cierra: %s\n",yytext);
-				return LL_C;
+					//printf("\nLlave que cierra: %s\n",yytext);
+					return LL_C;
 				}
 				
 {ID}			{
-				printf("\nIdentificador: %s\n",yytext);
-				return ID;
+					//printf("\nIdentificador: %s\n",yytext);
+					if(strlen(yytext) <= 30){
+						yylval.valor_string = strdup(yytext);
+						return ID;
+					}
+					else {
+						mensajeDeError(4);
+					}
 				}
 				
 {CTE_INT}		{
-				printf("\nConstante entera: %s\n",yytext);
-				if(atoll(yytext)<=32767)
-				{
-					int length = strlen(yytext);
-					char cte_nombre[length];
-					strcpy(cte_nombre, "_");
-					strcat(cte_nombre, yytext);
-				}
-				else
-				{
-				mensajeDeError(1);
-				}
-				
-				return CTE_INT;
+					//printf("\nConstante entera: %s\n",yytext);
+					if(atoll(yytext)>=-32768 && atoll(yytext)<=32767)
+					{
+						yylval.valor_int = atoi(yytext);
+					}
+					else
+					{
+						mensajeDeError(1);
+					}
+					
+					return CTE_INT;
 				}
 {CTE_REAL}		{
-				printf("\nConstante real: %s\n",yytext);
-				if(atof(yytext)<=3.40282347e+38F)
-				{
-				int length = strlen(yytext);
-				char cte_nombre[length];
-				strcpy(cte_nombre, "_");
-				strcat(cte_nombre, yytext);
-				}
-				else{
-					mensajeDeError(2);
-				}
-				return CTE_REAL;
+					//printf("\nConstante real: %s\n",yytext);
+					if(atof(yytext)<=3.40282347e+38F)
+					{
+						yylval.valor_float = atof( yytext );
+					}
+					else{
+						mensajeDeError(2);
+					}
+					return CTE_REAL;
 				}
 {CTE_STRING}	{
-				printf( "\nString: %s\n", yytext); 
-				if(strlen(yytext)<=32){
-					//pongo 32 porque toma en cuenta las comillas
-				int length = strlen(yytext);
-				char cte_nombre[length];
-				strcpy(cte_nombre, "_");
-				strcat(cte_nombre, yytext);
-					
+					//printf( "\nString: %s\n", yytext); 
+					if(strlen(yytext)<=30){
+						strcpy(yylval.valor_string,yytext);
+					}
+					else{
+						mensajeDeError(3);
+					}
 					return CTE_STRING;
 				}
-				else{
-					mensajeDeError(3);
-				}
-				return CTE_STRING;
-				}
 {CTE_HEXA}		{
-				printf("\nConstante hexa: %s\n",yytext);
-				int length = strlen(yytext);
-				char cte_nombre[length];
-				strcpy(cte_nombre, "_");
-				strcat(cte_nombre, yytext);
-				
-				int longitud = strlen(yytext);
-				char hexa[longitud-2];
-				quitarPrefijo(yytext,hexa,longitud);
-				longitud =  strlen(hexa);
-				unsigned long long decimal = hexadecimalADecimal(yytext,longitud);
-				return CTE_HEXA;
+					//printf("\nConstante hexa: %s\n",yytext);
+					int longitud = strlen(yytext);
+					char hexa[longitud-2];
+					quitarPrefijo(yytext,hexa,longitud);
+					longitud =  strlen(hexa);
+					unsigned long long decimal = hexadecimalADecimal(yytext,longitud);
+					strcpy(yylval.valor_string,yytext);
+					yylval.valor_hexa = decimal;
+					return CTE_HEXA;
 				}
 {CTE_BIN}		{
-				printf( "\nConstante binaria: %s\n", yytext); 
-				int length = strlen(yytext);
-				char cte_nombre[length];
-				strcpy(cte_nombre, "_");
-				strcat(cte_nombre, yytext);
-				
-				int longitud = strlen(yytext);
-				char binario2[longitud-2];
-				quitarPrefijo(yytext,binario2,longitud);
-				longitud =  strlen(binario2);
-				unsigned long long decimal = binarioADecimal(binario2,longitud);
-				return CTE_BIN;
+					//printf( "\nConstante binaria: %s\n", yytext); 
+					int longitud = strlen(yytext);
+					char binario2[longitud-2];
+					quitarPrefijo(yytext,binario2,longitud);
+					longitud =  strlen(binario2);
+					unsigned long long decimal = binarioADecimal(binario2,longitud);
+					strcpy(yylval.valor_string,yytext);
+					yylval.valor_bin = decimal;
+					return CTE_BIN;
 				}
 
-{OP_MAYOR}	{
-						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_MAYOR;
-					}
+{OP_MAYOR}		{
+					//printf("\nOperador de comparacion: %s\n", yytext);
+					return OP_MAYOR;
+				}
 
-{OP_MENOR}	{
-						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_MENOR;
-					}
+{OP_MENOR}		{
+					//printf("\nOperador de comparacion: %s\n", yytext);
+					return OP_MENOR;
+				}
 
-{OP_IGUAL}	{
-						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_IGUAL;
-					}
+{OP_IGUAL}		{
+					//printf("\nOperador de comparacion: %s\n", yytext);
+					return OP_IGUAL;
+				}
 
 {OP_MAYORIGUAL}	{
-						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_MAYORIGUAL;
-					}
+					//printf("\nOperador de comparacion: %s\n", yytext);
+					return OP_MAYORIGUAL;
+				}
 
 {OP_MENORIGUAL}	{
-						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_MENORIGUAL;
-					}
+					//printf("\nOperador de comparacion: %s\n", yytext);
+					return OP_MENORIGUAL;
+				}
 
 {OP_DISTINTO}	{
-						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_DISTINTO;
-					}
+					//printf("\nOperador de comparacion: %s\n", yytext);
+					return OP_DISTINTO;
+				}
 			
-{OP_LOGICO}	{
-				printf("\nOperador logico: %s\n", yytext);
+{OP_LOGICO}		{
+				//printf("\nOperador logico: %s\n", yytext);
 				return OP_LOGICO;
-			}
+				}
 
 {COMENT} 
 
@@ -356,6 +352,10 @@ void mensajeDeError(int error){
         case 3:
             printf("ERROR LEXICO. Descripcion: String fuera de rango. La longitud maxima es de 30 caracteres.\n");
             break ;
+
+		case 4:
+			printf("ERROR LEXICO. Descripcion: Nombre de variable demasiado largo.La longitud maxima es de 30 caracteres.\n");
+			break;
 
         }
 
