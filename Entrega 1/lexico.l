@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <string.h>
+#include <math.h>
 #include "y.tab.h"
 
 typedef struct{
@@ -17,7 +18,7 @@ typedef struct{
 FILE  *yyin;
 int yylval;
 char *yyltext;
-registro tabla[100];
+//registro tabla[100];
 int indice=0;
 
 unsigned long long binarioADecimal(char *, int );
@@ -36,38 +37,50 @@ DIGITO		[0-9]
 HEXA		[A-F]
 BIN			[0-1]
 LETRA		[a-zA-Z]
-CTE_REAL    	{DIGITO}+"."{DIGITO}+
-CTE_INT     	{DIGITO}+
-ID		{LETRA}({LETRA}|{DIGITO})*
-OP_ASIG   	":="
-OP_LOGICO	["and"|"or"]
+
+CTE_REAL    	-?{DIGITO}{1,10}\.{DIGITO}{0,10}|-?{DIGITO}{0,10}\.{DIGITO}{1,10}
+CTE_INT     	-?{DIGITO}+
+ID				{LETRA}({LETRA}|{DIGITO})*
+
+OP_ASIG   		":="
+OP_LOGICO		["and"|"or"]
 OP_NEGACION 	"not"
-OP_COMPARACION  ["<"|"=="|">"|"<="|">="|"<>"]
+OP_MAYOR		">"
+OP_MENOR		"<"
+OP_IGUAL		"=="
+OP_MAYORIGUAL	">="
+OP_MENORIGUAL	"<="
+OP_DISTINTO		"<>"
 OP_SUMA         ["+"]
 OP_DIVI         ["/"]
 OP_REST         ["-"]
 OP_MULT         ["*"]
+
 P_A             ["("]
 P_C             [")"]
 LL_A            ["{"]
 LL_C            ["}"]
-COMENT		\*-.*\-*
-COMA		[","]
-P_Y_C		[";"]
-ESPACIO		[" "]
-CTE_STRING 	\".*\"
-PUT		"PUT"
-GET		"GET"
-INTEGER		"Integer"
-FLOAT		"Float"
-WHILE 		"while"
-IF		"if"
-ELSE		"Else"
-CTE_BIN		"0b"{BIN}+
-CTE_HEXA	"0x"({DIGITO}|{HEXA})*
-MAXIMO		"maximo"
-DIM		"DIM"
-AS		"AS"
+
+COMENT			\*-.*\-*
+COMA			[","]
+P_Y_C			[";"]
+ESPACIO			[" "]
+CTE_STRING 		\".*\"
+
+PUT				"PUT"
+GET				"GET"
+
+INTEGER			"Integer"
+FLOAT			"Float"
+
+WHILE 			"while"
+IF				"if"
+ELSE			"Else"
+CTE_BIN			"0b"{BIN}+
+CTE_HEXA		"0x"({DIGITO}|{HEXA})*
+MAXIMO			"maximo"
+DIM				"DIM"
+AS				"AS"
 
 %%
 
@@ -159,10 +172,6 @@ AS		"AS"
 				printf("\nLlave que cierra: %s\n",yytext);
 				return LL_C;
 				}
-{COMENT}		{
-				printf("\nComentario: %s\n",yytext);
-				return COMENT;
-				}
 				
 {ID}			{
 				printf("\nIdentificador: %s\n",yytext);
@@ -195,14 +204,14 @@ AS		"AS"
 				strcat(cte_nombre, yytext);
 				}
 				else{
-				void mensajeDeError(2);
+					mensajeDeError(2);
 				}
 				return CTE_REAL;
 				}
 {CTE_STRING}	{
 				printf( "\nString: %s\n", yytext); 
-				if(strlen(yytext)<=30){
-
+				if(strlen(yytext)<=32){
+					//pongo 32 porque toma en cuenta las comillas
 				int length = strlen(yytext);
 				char cte_nombre[length];
 				strcpy(cte_nombre, "_");
@@ -211,7 +220,7 @@ AS		"AS"
 					return CTE_STRING;
 				}
 				else{
-					void mensajeDeError(3);
+					mensajeDeError(3);
 				}
 				return CTE_STRING;
 				}
@@ -244,44 +253,53 @@ AS		"AS"
 				return CTE_BIN;
 				}
 
-{OP_COMPARACION}	{
+{OP_MAYOR}	{
 						printf("\nOperador de comparacion: %s\n", yytext);
-						return OP_COMPARACION;
+						return OP_MAYOR;
+					}
+
+{OP_MENOR}	{
+						printf("\nOperador de comparacion: %s\n", yytext);
+						return OP_MENOR;
+					}
+
+{OP_IGUAL}	{
+						printf("\nOperador de comparacion: %s\n", yytext);
+						return OP_IGUAL;
+					}
+
+{OP_MAYORIGUAL}	{
+						printf("\nOperador de comparacion: %s\n", yytext);
+						return OP_MAYORIGUAL;
+					}
+
+{OP_MENORIGUAL}	{
+						printf("\nOperador de comparacion: %s\n", yytext);
+						return OP_MENORIGUAL;
+					}
+
+{OP_DISTINTO}	{
+						printf("\nOperador de comparacion: %s\n", yytext);
+						return OP_DISTINTO;
 					}
 			
 {OP_LOGICO}	{
 				printf("\nOperador logico: %s\n", yytext);
 				return OP_LOGICO;
-		}
+			}
+
+{COMENT}
 
 \n
 \t
 %%
 
-
-int main (int argc,char *argv[]){
- if ((yyin=fopen(argv[1],"rt"))==NULL)
- {
-  	printf("\nNo se puede abrir el archivo: %s\n",argv[1]);
- }
- else{
-	yylex();
- }
- fclose(yyin);
- return 0;
-}
-int yyerror(void)
-	{ 
- 	  printf("Syntax Error\n");
-	  system("Pause");
-          exit (1);
-	}
-
 unsigned long long binarioADecimal(char *cadenaBinaria, int longitud) {
   unsigned long long decimal = 0;
   int multiplicador = 1;
   char caracterActual;
-  for (int i = longitud - 1; i >= 0; i--) {
+  int i;
+  for (i = longitud - 1; i >= 0; i--) {
     caracterActual = cadenaBinaria[i];
     if (caracterActual == '1') {
       decimal += multiplicador;
@@ -312,7 +330,8 @@ int caracterHexadecimalADecimal(char caracter) {
 unsigned long long hexadecimalADecimal(char *cadenaHexadecimal, int longitud) {
   unsigned long long decimal = 0;
   int potencia = 0;
-  for (int i = longitud - 1; i >= 0; i--) {
+  int i;
+  for (i = longitud - 1; i >= 0; i--) {
     
     int valorActual = caracterHexadecimalADecimal(cadenaHexadecimal[i]);
     unsigned long long elevado = pow(16, potencia) * valorActual;

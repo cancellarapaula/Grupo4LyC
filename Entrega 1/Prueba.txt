@@ -18,5 +18,5 @@ PUT "act es > 2 y != de cero";
 Else
 }
 if (actual < 0b111010)
-PUT "no es mayor que 2"
+PUT "no es mayor que 2";
 }

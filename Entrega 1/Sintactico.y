@@ -23,7 +23,12 @@ FILE  *yyin;
 %token OP_MULT
 %token OP_DIVI
 %token OP_ASIG
-%token OP_COMPARACION
+%token OP_MAYOR
+%token OP_MENOR
+%token OP_IGUAL
+%token OP_MAYORIGUAL
+%token OP_MENORIGUAL
+%token OP_DISTINTO
 %token OP_LOGICO
 %token OP_NEGACION
 %token CTE_INT
@@ -40,41 +45,44 @@ FILE  *yyin;
 %token GET
 %token DIM
 %token AS
-%token C_A
-%token C_C
 %token WHILE
+%token MAXIMO
 %token ID
 
 %%
 programa:  	   	   
   {printf("INICIA COMPILACION\n");}
-  est_declaracion algoritmo
+  bloque_declaracion bloque
   {printf("FIN COMPILACION\n");} 
 ;  
 
-est_declaracion:
-  DIM declaraciones ENDDEF 
-;
-
-declaraciones:         	        	
-  declaracion
-  |declaraciones declaracion
+bloque_declaracion:         	        	
+  bloque_declaracion declaracion
+  |declaracion
 ;
 
 declaracion:  
-  FLOAT DOSPUNTOS lista_var
-  |INTEGER DOSPUNTOS lista_var
-  |STRING DOSPUNTOS lista_var
+  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR
 ;
 
 lista_var:  
-  ID
-  |lista_var P_Y_C ID  
+  lista_var COMA ID
+  |ID
 ;
 
-algoritmo: 
-  sentencia
-  |algoritmo sentencia
+lista_tipos:
+  lista_tipos COMA tipo_dato
+  |tipo_dato
+  ;
+
+tipo_dato:
+  INTEGER
+  |FLOAT
+;
+
+bloque: 
+  bloque sentencia
+  |sentencia
 ;
 
 sentencia:
@@ -86,56 +94,75 @@ sentencia:
 ;
 
 ciclo:
-	WHILE P_A decision P_C LL_A algoritmo LL_C 
+	WHILE P_A decision P_C LL_A bloque LL_C 
 ;
 
 asignacion: 
-	ID OP_ASIG expresion
+	ID OP_ASIG expresion P_Y_C
 ;
 
 if: 
-	IF P_A decision P_C LL_A algoritmo LL_C 
-	|IF P_A decision P_C LL_A algoritmo LL_C ELSE LL_A algoritmo LL_C
+	IF P_A decision P_C LL_A bloque LL_C 
+	|IF P_A decision P_C LL_A bloque LL_C ELSE LL_A bloque LL_C
 ;
 
 decision:
-	condicion
-	|condicion OP_LOGICO condicion
-	|OP_NEGACION condicion
+  decision OP_LOGICO condicion
+  |condicion
 ;
 
 condicion:
-	expresion OP_COMPARACION expresion
+  OP_NEGACION condicion
+  |expresion comparador expresion
+;
+
+comparador:
+  OP_IGUAL
+  |OP_DISTINTO
+  |OP_MAYOR
+  |OP_MENOR
+  |OP_MENORIGUAL
+  |OP_MAYORIGUAL
 ;
 
 expresion:
-	termino
-	|expresion OP_SUMA termino
+  expresion OP_SUMA termino
 	|expresion OP_REST termino
+  |termino
 ;
 
 termino: 
-	factor
-	|termino OP_MULT factor 
+  termino OP_MULT factor 
 	|termino OP_DIVI factor 
+  |factor
 ;
 
-factor: 
-	ID
+factor:
+  P_A expresion P_C
+  |maximo
+	|ID
 	|CTE_STRING
 	|CTE_INT
 	|CTE_REAL
 	|CTE_BIN
 	|CTE_HEXA
 ;
+maximo:
+  MAXIMO P_A lista_expresion P_C
+;
+
+lista_expresion:
+  lista_expresion COMA expresion
+  | expresion
+;
 
 salida:
-	PUT CTE_STRING 
-	|PUT ID
+	PUT CTE_STRING P_Y_C
+	|PUT ID P_Y_C
 ;
 
 entrada:
-  GET ID 
+  GET ID P_Y_C
 ;
 
 %%
