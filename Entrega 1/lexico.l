@@ -45,12 +45,12 @@ ID				{LETRA}({LETRA}|{DIGITO})*
 OP_ASIG   		":="
 OP_LOGICO		["and"|"or"]
 OP_NEGACION 	"not"
+OP_DISTINTO		"<>"
+OP_MAYORIGUAL	">="
+OP_MENORIGUAL	"<="
 OP_MAYOR		">"
 OP_MENOR		"<"
 OP_IGUAL		"=="
-OP_MAYORIGUAL	">="
-OP_MENORIGUAL	"<="
-OP_DISTINTO		"<>"
 OP_SUMA         ["+"]
 OP_DIVI         ["/"]
 OP_REST         ["-"]
@@ -75,7 +75,7 @@ FLOAT			"Float"
 
 WHILE 			"while"
 IF				"if"
-ELSE			"Else"
+ELSE			"else"
 CTE_BIN			"0b"{BIN}+
 CTE_HEXA		"0x"({DIGITO}|{HEXA})*
 MAXIMO			"maximo"

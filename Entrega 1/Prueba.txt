@@ -12,11 +12,12 @@ suma:= suma + actual;
 }
 PUT "La suma es: ";
 PUT suma;
-if (actual > 0b10 and actual <> 0){
+if (actual > 0b10){
 PUT "act es > 2 y != de cero";
 }
-Else
-}
-if (actual < 0b111010)
-PUT "no es mayor que 2";
+else
+{
+    if (actual < 0b111010) {
+        PUT "no es mayor que 2";
+    }
 }

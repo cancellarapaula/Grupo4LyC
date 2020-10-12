@@ -119,10 +119,10 @@ condicion:
 comparador:
   OP_IGUAL
   |OP_DISTINTO
-  |OP_MAYOR
-  |OP_MENOR
   |OP_MENORIGUAL
   |OP_MAYORIGUAL
+  |OP_MAYOR
+  |OP_MENOR
 ;
 
 expresion:
