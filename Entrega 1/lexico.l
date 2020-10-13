@@ -89,100 +89,100 @@ AS				"AS"
 %%
 
 {PUT}			{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return PUT;
 				}
 {GET}			{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return GET;
 				}
 {INTEGER}		{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return INTEGER;
 				}
 {FLOAT}			{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return FLOAT;
 				}
 {STRING}		{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return STRING;
 				}
 {IF}			{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return IF;
 				}
 {ELSE}   		{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return ELSE;
 				}
 {WHILE}	  		{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return WHILE;
 				}
 {MAXIMO}		{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return MAXIMO;
 				}
 {DIM}			{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return DIM;
 				}
 {AS}			{
-					//printf("\nPalabra reservada: %s\n",yytext);
+					printf("\nPalabra reservada: %s\n",yytext);
 					return AS;
 				}
 {OP_ASIG}		{
-					//printf("\nAsignacion: %s\n",yytext);
+					printf("\nAsignacion: %s\n",yytext);
 					return OP_ASIG;
 				}
 {OP_NEGACION}	{
-					//printf("\nNegacion: %s\n",yytext);
+					printf("\nNegacion: %s\n",yytext);
 					return OP_NEGACION;
 				}
 {OP_SUMA}		{
-					//printf("\nSuma: %s\n",yytext);
+					printf("\nSuma: %s\n",yytext);
 					return OP_SUMA;
 				}
 {OP_REST}		{
-					//printf("\nResta: %s\n",yytext);
+					printf("\nResta: %s\n",yytext);
 					return OP_REST;
 				}
 {OP_MULT}		{
-					//printf("\nMultiplicacion: %s\n",yytext);
+					printf("\nMultiplicacion: %s\n",yytext);
 					return OP_MULT;
 				}
 {OP_DIVI}		{
-					//printf("\nDivision: %s\n",yytext);
+					printf("\nDivision: %s\n",yytext);
 					return OP_DIVI;
 				}
 {COMA}			{
-					//printf("\nComa: %s\n",yytext);
+					printf("\nComa: %s\n",yytext);
 					return COMA;
 				}
 {P_Y_C}			{
-					//printf("\nPunto y coma: %s\n",yytext);
+					printf("\nPunto y coma: %s\n",yytext);
 					return P_Y_C;
 				}
 {P_A}			{
-					//printf("\nParentesis que abre: %s\n",yytext);
+					printf("\nParentesis que abre: %s\n",yytext);
 					return P_A;
 				}
 {P_C}			{
-					//printf("\nParentesis que cierra: %s\n",yytext);
+					printf("\nParentesis que cierra: %s\n",yytext);
 					return P_C;
 				}
 {LL_A}			{
-					//printf("\nLlave que abre: %s\n",yytext);
+					printf("\nLlave que abre: %s\n",yytext);
 					return LL_A;
 				}
 {LL_C}			{
-					//printf("\nLlave que cierra: %s\n",yytext);
+					printf("\nLlave que cierra: %s\n",yytext);
 					return LL_C;
 				}
 				
 {ID}			{
-					//printf("\nIdentificador: %s\n",yytext);
+					printf("\nIdentificador: %s\n",yytext);
 					if(strlen(yytext) <= 30){
 						yylval.valor_string = strdup(yytext);
 						return ID;
@@ -193,7 +193,7 @@ AS				"AS"
 				}
 				
 {CTE_INT}		{
-					//printf("\nConstante entera: %s\n",yytext);
+					printf("\nConstante entera: %s\n",yytext);
 					if(atoll(yytext)>=-32768 && atoll(yytext)<=32767)
 					{
 						yylval.valor_int = atoi(yytext);
@@ -206,7 +206,7 @@ AS				"AS"
 					return CTE_INT;
 				}
 {CTE_REAL}		{
-					//printf("\nConstante real: %s\n",yytext);
+					printf("\nConstante real: %s\n",yytext);
 					if(atof(yytext)<=3.40282347e+38F)
 					{
 						yylval.valor_float = atof( yytext );
@@ -217,7 +217,7 @@ AS				"AS"
 					return CTE_REAL;
 				}
 {CTE_STRING}	{
-					//printf( "\nString: %s\n", yytext); 
+					printf( "\nString: %s\n", yytext); 
 					if(strlen(yytext)<=30){
 						strcpy(yylval.valor_string,yytext);
 					}
@@ -227,7 +227,7 @@ AS				"AS"
 					return CTE_STRING;
 				}
 {CTE_HEXA}		{
-					//printf("\nConstante hexa: %s\n",yytext);
+					printf("\nConstante hexa: %s\n",yytext);
 					int longitud = strlen(yytext);
 					char hexa[longitud-2];
 					quitarPrefijo(yytext,hexa,longitud);
@@ -238,7 +238,7 @@ AS				"AS"
 					return CTE_HEXA;
 				}
 {CTE_BIN}		{
-					//printf( "\nConstante binaria: %s\n", yytext); 
+					printf( "\nConstante binaria: %s\n", yytext); 
 					int longitud = strlen(yytext);
 					char binario2[longitud-2];
 					quitarPrefijo(yytext,binario2,longitud);
@@ -250,37 +250,37 @@ AS				"AS"
 				}
 
 {OP_MAYOR}		{
-					//printf("\nOperador de comparacion: %s\n", yytext);
+					printf("\nOperador de comparacion: %s\n", yytext);
 					return OP_MAYOR;
 				}
 
 {OP_MENOR}		{
-					//printf("\nOperador de comparacion: %s\n", yytext);
+					printf("\nOperador de comparacion: %s\n", yytext);
 					return OP_MENOR;
 				}
 
 {OP_IGUAL}		{
-					//printf("\nOperador de comparacion: %s\n", yytext);
+					printf("\nOperador de comparacion: %s\n", yytext);
 					return OP_IGUAL;
 				}
 
 {OP_MAYORIGUAL}	{
-					//printf("\nOperador de comparacion: %s\n", yytext);
+					printf("\nOperador de comparacion: %s\n", yytext);
 					return OP_MAYORIGUAL;
 				}
 
 {OP_MENORIGUAL}	{
-					//printf("\nOperador de comparacion: %s\n", yytext);
+					printf("\nOperador de comparacion: %s\n", yytext);
 					return OP_MENORIGUAL;
 				}
 
 {OP_DISTINTO}	{
-					//printf("\nOperador de comparacion: %s\n", yytext);
+					printf("\nOperador de comparacion: %s\n", yytext);
 					return OP_DISTINTO;
 				}
 			
 {OP_LOGICO}		{
-				//printf("\nOperador logico: %s\n", yytext);
+				printf("\nOperador logico: %s\n", yytext);
 				return OP_LOGICO;
 				}
 
