@@ -464,10 +464,10 @@ void guardarTabla(){
 			fprintf(arch, "|%-30s|%-30s|%-30d", "CTE_STRING",&(tabla_simbolo[i].valor_s), tabla_simbolo[i].longitud);
 			break;
     	case CteBinaria:
-			fprintf(arch, "|%-30s|%-30d|%-30d", "CTE_BINARIA",tabla_simbolo[i].valor_i, "--");
+			fprintf(arch, "|%-30s|%-30d|%-30s", "CTE_BINARIA",tabla_simbolo[i].valor_i, "--");
 			break;
     	case CteHexa:
-			fprintf(arch, "|%-30s|%-30d|%-30d", "CTE_HEXA",tabla_simbolo[i].valor_i, "--");
+			fprintf(arch, "|%-30s|%-30d|%-30s", "CTE_HEXA",tabla_simbolo[i].valor_i, "--");
 			break;
 		}
 
