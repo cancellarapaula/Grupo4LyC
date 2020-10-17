@@ -24,10 +24,10 @@
 #include <math.h>
 #include "y.tab.h"
 
-unsigned long long binarioADecimal(char *, int );
-unsigned long long hexaADecimal(char *, int );
+int binarioADecimal(char *, int );
+int hexaADecimal(char *, int );
 void quitarPrefijo(char *, char * , int);
-unsigned long long hexadecimalADecimal(char *, int );
+int hexadecimalADecimal(char *, int );
 int caracterHexadecimalADecimal(char );
 void mensajeDeError(int );
 
@@ -227,25 +227,23 @@ AS				"AS"
 					return CTE_STRING;
 				}
 {CTE_HEXA}		{
-					printf("\nConstante hexa: %s\n",yytext);
-					int longitud = strlen(yytext);
-					char hexa[longitud-2];
-					quitarPrefijo(yytext,hexa,longitud);
-					longitud =  strlen(hexa);
-					unsigned long long decimal = hexadecimalADecimal(yytext,longitud);
-					strcpy(yylval.valor_string,yytext);
-					yylval.valor_hexa = decimal;
+					printf("\nConstante hexadecimal: %s\n",yytext);
+					if(strlen(yytext)<=30){
+						yylval.valor_string = strdup(yytext);
+					}
+					else{
+						mensajeDeError(5);
+					}
 					return CTE_HEXA;
 				}
 {CTE_BIN}		{
-					printf( "\nConstante binaria: %s\n", yytext); 
-					int longitud = strlen(yytext);
-					char binario2[longitud-2];
-					quitarPrefijo(yytext,binario2,longitud);
-					longitud =  strlen(binario2);
-					unsigned long long decimal = binarioADecimal(binario2,longitud);
-					strcpy(yylval.valor_string,yytext);
-					yylval.valor_bin = decimal;
+					printf("\nConstante binaria: %s\n",yytext);
+					if(strlen(yytext)<=30){
+						yylval.valor_string = strdup(yytext);
+					}
+					else{
+						mensajeDeError(6);
+					}
 					return CTE_BIN;
 				}
 
@@ -290,53 +288,6 @@ AS				"AS"
 \t
 %%
 
-unsigned long long binarioADecimal(char *cadenaBinaria, int longitud) {
-  unsigned long long decimal = 0;
-  int multiplicador = 1;
-  char caracterActual;
-  int i;
-  for (i = longitud - 1; i >= 0; i--) {
-    caracterActual = cadenaBinaria[i];
-    if (caracterActual == '1') {
-      decimal += multiplicador;
-    }
-    multiplicador = multiplicador * 2;
-  }
-  return decimal;
-}
-
-void quitarPrefijo(char *cadena, char *nuevaCadena, int longitud) {
-	int j=0;
-    int i;
-	for(i=2;i<=longitud-1;i++){
-
-		nuevaCadena[j]=cadena[i];
-		j++;
-	}
-	nuevaCadena[j]='\0';
-
-}
-
-int caracterHexadecimalADecimal(char caracter) {
-  if (isdigit(caracter))
-    return caracter - '0';
-  return 10 + (toupper(caracter) - 'A');
-}
-
-unsigned long long hexadecimalADecimal(char *cadenaHexadecimal, int longitud) {
-  unsigned long long decimal = 0;
-  int potencia = 0;
-  int i;
-  for (i = longitud - 1; i >= 0; i--) {
-    
-    int valorActual = caracterHexadecimalADecimal(cadenaHexadecimal[i]);
-    unsigned long long elevado = pow(16, potencia) * valorActual;
-  
-    decimal += elevado;
-    potencia++;
-  }
-  return decimal;
-}
 void mensajeDeError(int error){
 
 	switch(error){
@@ -354,7 +305,15 @@ void mensajeDeError(int error){
             break ;
 
 		case 4:
-			printf("ERROR LEXICO. Descripcion: Nombre de variable demasiado largo.La longitud maxima es de 30 caracteres.\n");
+			printf("ERROR LEXICO. Descripcion: Nombre de variable demasiado largo. La longitud maxima es de 30 caracteres.\n");
+			break;
+
+		case 5:
+			printf("ERROR LEXICO. Descripcion: Constante hexadecimal demasiado larga. La longitud maxima es de 30 caracteres.\n");
+			break;
+
+		case 6:
+			printf("ERROR LEXICO. Descripcion: Constante binaria demasiado larga. La longitud maxima es de 30 caracteres.\n");
 			break;
 
         }

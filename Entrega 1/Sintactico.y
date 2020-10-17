@@ -43,11 +43,11 @@
 	int yyerror(char* mensaje);
 	void agregarVarATabla(char* nombre);
 	void agregarTiposDatosATabla(void);
-	void agregarCteStringATabla(char* nombre);
+	void agregarCteStringATabla(char* str);
 	void agregarCteIntATabla(int valor);
 	void agregarCteRealATabla(float valor);
-  	void agregarCteBinariaATabla(char* nombre, int valor);
-  	void agregarCteHexaATabla(char* nombre, int valor);
+  	void agregarCteBinariaATabla(char* str);
+  	void agregarCteHexaATabla(char* str);
 	void chequearVarEnTabla(char* nombre);
 	int buscarEnTabla(char * name);
 	void escribirNombreEnTabla(char* nombre, int pos);
@@ -82,8 +82,6 @@
     int valor_int;
     float valor_float;
     char *valor_string;
-    int valor_bin;
-    int valor_hexa;
   }
 
 %token P_Y_C
@@ -107,8 +105,8 @@
 %token OP_NEGACION
 %token <valor_int>CTE_INT
 %token <valor_float>CTE_REAL
-%token <valor_bin>CTE_BIN
-%token <valor_hexa>CTE_HEXA
+%token <valor_string>CTE_BIN
+%token <valor_string>CTE_HEXA
 %token <valor_string>CTE_STRING
 %token IF 
 %token ELSE	
@@ -270,11 +268,12 @@ factor:
 														  }
 	|CTE_BIN                    {
                                 printf("Regla FACTOR es cte_bin\n");
-                                agregarCteBinariaATabla(yylval.valor_string, yylval.valor_bin);
+                                agregarCteBinariaATabla(yylval.valor_string);
                               }
 	|CTE_HEXA                   {
-                                printf("Regla FACTOR es cte_hexa\n");
-                                agregarCteHexaATabla(yylval.valor_string, yylval.valor_hexa);
+                                printf("Regla FACTOR es cte_hexa 1 1 \n");
+                                agregarCteHexaATabla(yylval.valor_string);
+								printf("Regla FACTOR es cte_hexa 2\n");
                               }
 ;
 maximo:
@@ -330,6 +329,56 @@ int yyerror(char* mensaje)
 	system ("Pause");
 	exit (1);
  }
+
+
+/* Funciones de las constantes especiales */
+int binarioADecimal(char *cadenaBinaria, int longitud) {
+  int decimal = 0;
+  int multiplicador = 1;
+  char caracterActual;
+  int i;
+  for (i = longitud - 1; i >= 0; i--) {
+    caracterActual = cadenaBinaria[i];
+    if (caracterActual == '1') {
+      decimal += multiplicador;
+    }
+    multiplicador = multiplicador * 2;
+  }
+  return decimal;
+}
+
+void quitarPrefijo(char *cadena, char *nuevaCadena, int longitud) {
+	int j=0;
+    int i;
+	for(i=2;i<=longitud-1;i++){
+
+		nuevaCadena[j]=cadena[i];
+		j++;
+	}
+	nuevaCadena[j]='\0';
+
+}
+
+int caracterHexadecimalADecimal(char caracter) {
+  if (isdigit(caracter))
+    return caracter - '0';
+  return 10 + (toupper(caracter) - 'A');
+}
+
+int hexadecimalADecimal(char *cadenaHexadecimal, int longitud) {
+  int decimal = 0;
+  int potencia = 0;
+  int i;
+  for (i = longitud - 1; i >= 0; i--) {
+    
+    int valorActual = caracterHexadecimalADecimal(cadenaHexadecimal[i]);
+    int elevado = pow(16, potencia) * valorActual;
+  
+    decimal += elevado;
+    potencia++;
+  }
+  return decimal;
+}
 
 /* Funciones de la tabla de simbolos */
 
@@ -414,11 +463,11 @@ void guardarTabla(){
 		case CteString:
 			fprintf(arch, "|%-30s|%-30s|%-30d", "CTE_STRING",&(tabla_simbolo[i].valor_s), tabla_simbolo[i].longitud);
 			break;
-    case CteBinaria:
-			fprintf(arch, "|%-30s|%-30s|%-30d", "CTE_BINARIA",&(tabla_simbolo[i].valor_s), "--");
+    	case CteBinaria:
+			fprintf(arch, "|%-30s|%-30d|%-30d", "CTE_BINARIA",tabla_simbolo[i].valor_i, "--");
 			break;
-    case CteHexa:
-			fprintf(arch, "|%-30s|%-30s|%-30d", "CTE_HEXA",&(tabla_simbolo[i].valor_s), "--");
+    	case CteHexa:
+			fprintf(arch, "|%-30s|%-30d|%-30d", "CTE_HEXA",tabla_simbolo[i].valor_i, "--");
 			break;
 		}
 
@@ -428,31 +477,31 @@ void guardarTabla(){
 }
 
 /** Agrega una constante string a la tabla de simbolos */
-void agregarCteStringATabla(char* nombre){
+void agregarCteStringATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
 		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
 		system("Pause");
 		exit(2);
 	}
 
-	char nombreAux[31] = "_";
+	char nombre[31] = "_";
 
-	int length = strlen(nombre);
+	int length = strlen(str);
 	char auxiliar[length];
-	strcpy(auxiliar,nombre);
+	strcpy(auxiliar,str);
 	auxiliar[strlen(auxiliar)-1] = '\0';
 
 	//Queda en auxiliar el valor SIN COMILLAS
 	strcpy(auxiliar, auxiliar+1);
 
-	//Queda en nombreAux como lo voy a guardar en la tabla de simbolos 
-	strcat(nombreAux, auxiliar); 
+	//Queda en nombre como lo voy a guardar en la tabla de simbolos 
+	strcat(nombre, auxiliar); 
 
 	//Si no hay otra variable con el mismo nombre...
-	if(buscarEnTabla(nombreAux) == -1){
+	if(buscarEnTabla(nombre) == -1){
 		//Agregar nombre a tabla
 		fin_tabla++;
-		escribirNombreEnTabla(nombreAux, fin_tabla);
+		escribirNombreEnTabla(nombre, fin_tabla);
 
 		//Agregar tipo de dato
 		tabla_simbolo[fin_tabla].tipo_dato = CteString;
@@ -518,15 +567,23 @@ void agregarCteIntATabla(int valor){
 }
 
 /** Agrega una constante binaria a la tabla de simbolos */
-void agregarCteBinariaATabla(char* nombre, int valor){
+void agregarCteBinariaATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
 		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
 		system("Pause");
 		exit(2);
 	}
 
-  //Genero el nombre
-	sprintf(nombre, "_%s", nombre);
+	char nombre[31] = "_";
+	//Queda en nombre como lo voy a guardar en la tabla de simbolos 
+	strcat(nombre, str); 
+
+	int longitud = strlen(str);
+	char binario2[longitud-2];
+	quitarPrefijo(str,binario2,longitud);
+	longitud =  strlen(binario2);
+	
+	int decimal = binarioADecimal(binario2,longitud);
 
 	//Si no hay otra variable con el mismo nombre...
 	if(buscarEnTabla(nombre) == -1){
@@ -538,20 +595,27 @@ void agregarCteBinariaATabla(char* nombre, int valor){
 		tabla_simbolo[fin_tabla].tipo_dato = CteBinaria;
 
 		//Agregar valor a la tabla
-		tabla_simbolo[fin_tabla].valor_i = valor;
+		tabla_simbolo[fin_tabla].valor_i = decimal;
 	}
 }
 
 /** Agrega una constante hexa a la tabla de simbolos */
-void agregarCteHexaATabla(char* nombre, int valor){
+void agregarCteHexaATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
 		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
 		system("Pause");
 		exit(2);
 	}
 
-  //Genero el nombre
-	sprintf(nombre, "_%s", nombre);
+	char nombre[31] = "_";
+	//Queda en nombre como lo voy a guardar en la tabla de simbolos 
+	strcat(nombre, str); 
+
+	int longitud = strlen(str);
+	char hexa2[longitud-2];
+	quitarPrefijo(str,hexa2,longitud);
+	longitud =  strlen(hexa2);
+	int decimal = hexadecimalADecimal(hexa2,longitud);
 
 	//Si no hay otra variable con el mismo nombre...
 	if(buscarEnTabla(nombre) == -1){
@@ -563,7 +627,7 @@ void agregarCteHexaATabla(char* nombre, int valor){
 		tabla_simbolo[fin_tabla].tipo_dato = CteHexa;
 
 		//Agregar valor a la tabla
-		tabla_simbolo[fin_tabla].valor_i = valor;
+		tabla_simbolo[fin_tabla].valor_i = decimal;
 	}
 }
 
