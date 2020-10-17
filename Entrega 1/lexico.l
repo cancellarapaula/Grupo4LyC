@@ -217,9 +217,9 @@ AS				"AS"
 					return CTE_REAL;
 				}
 {CTE_STRING}	{
-					printf( "\nString: %s\n", yytext); 
+					printf( "\nConstante String: %s\n", yytext); 
 					if(strlen(yytext)<=30){
-						strcpy(yylval.valor_string,yytext);
+						yylval.valor_string = strdup(yytext);
 					}
 					else{
 						mensajeDeError(3);

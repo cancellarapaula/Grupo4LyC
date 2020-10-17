@@ -131,6 +131,11 @@ programa:
                                     printf("COMPILACION EXITOSA\n");
                                     guardarTabla();
                                   }
+	|bloque						{
+                                    printf("Regla PROGRAMA es bloque_declaracion bloque\n");
+                                    printf("COMPILACION EXITOSA\n");
+                                    guardarTabla();
+                                  }
 ;  
 
 bloque_declaracion:         	        	
@@ -375,13 +380,14 @@ void agregarTiposDatosATabla(){
 void guardarTabla(){
 	if(fin_tabla == -1)
 		yyerror("No se encontro la tabla de simbolos");
+	FILE* arch;
 
-	FILE* arch = fopen("ts.txt", "w+");
+	arch = fopen("ts.txt", "w");
 	if(!arch){
 		printf("No se pudo crear el archivo ts.txt\n");
 		return;
 	}
-	
+
 	int i;
 
 	fprintf(arch, "%-30s|%-30s|%-30s|%-30s\n","NOMBRE","TIPO","VALOR","LONGITUD");
@@ -429,27 +435,33 @@ void agregarCteStringATabla(char* nombre){
 		exit(2);
 	}
 
-	//Genero el nombre
-	sprintf(nombre, "_%s", nombre);
+	char nombreAux[31] = "_";
+
+	int length = strlen(nombre);
+	char auxiliar[length];
+	strcpy(auxiliar,nombre);
+	auxiliar[strlen(auxiliar)-1] = '\0';
+
+	//Queda en auxiliar el valor SIN COMILLAS
+	strcpy(auxiliar, auxiliar+1);
+
+	//Queda en nombreAux como lo voy a guardar en la tabla de simbolos 
+	strcat(nombreAux, auxiliar); 
 
 	//Si no hay otra variable con el mismo nombre...
-	if(buscarEnTabla(nombre) == -1){
+	if(buscarEnTabla(nombreAux) == -1){
 		//Agregar nombre a tabla
 		fin_tabla++;
-		escribirNombreEnTabla(nombre, fin_tabla);
+		escribirNombreEnTabla(nombreAux, fin_tabla);
 
 		//Agregar tipo de dato
 		tabla_simbolo[fin_tabla].tipo_dato = CteString;
 
 		//Agregar valor a la tabla
-		int length = strlen(nombre);
-		char auxiliar[length];
-		strcpy(auxiliar,nombre);
-		auxiliar[strlen(auxiliar)-1] = '\0';
-		strcpy(tabla_simbolo[fin_tabla].valor_s, auxiliar+1); 
+		strcpy(tabla_simbolo[fin_tabla].valor_s, auxiliar); 
 
 		//Agregar longitud
-		tabla_simbolo[fin_tabla].longitud = strlen(nombre) - 2;
+		tabla_simbolo[fin_tabla].longitud = strlen(tabla_simbolo[fin_tabla].valor_s);
 	}
 }
 
