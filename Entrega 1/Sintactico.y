@@ -34,7 +34,7 @@
  	#define CteBinaria 7
 	#define CteHexa 8 
 
-	#define TAMANIO_TABLA 300
+	#define TAMANIO_TABLA 3000
 	#define TAM_NOMBRE 32
 
 	int yylex();
@@ -46,8 +46,8 @@
 	void agregarCteStringATabla(char* nombre);
 	void agregarCteIntATabla(int valor);
 	void agregarCteRealATabla(float valor);
-  void agregarCteBinariaATabla(char* nombre, int valor);
-  void agregarCteHexaATabla(char* nombre, int valor);
+  	void agregarCteBinariaATabla(char* nombre, int valor);
+  	void agregarCteHexaATabla(char* nombre, int valor);
 	void chequearVarEnTabla(char* nombre);
 	int buscarEnTabla(char * name);
 	void escribirNombreEnTabla(char* nombre, int pos);
@@ -72,6 +72,7 @@
 	/* Globales para la declaracion de variables y la tabla de simbolos */
 	int varADeclarar1 = 0;
 	int cantVarsADeclarar = 0;
+	int cantTipoDatoDeclarado = 0;
 	int tipoDatoADeclarar;
 
 %}
@@ -129,7 +130,7 @@ programa:
                                     printf("Regla PROGRAMA es bloque_declaracion bloque\n");
                                     printf("COMPILACION EXITOSA\n");
                                     guardarTabla();
-                                  };
+                                  }
 ;  
 
 bloque_declaracion:         	        	
@@ -144,24 +145,26 @@ declaracion:
 lista_var:  
   lista_var COMA ID              {
                                   printf("Regla LISTA_VAR es lista_var, ID\n");
-                                  agregarVarATabla(yylval.valor_string);
-															    cantVarsADeclarar++;
+								  	cantVarsADeclarar++;
+                                  	agregarVarATabla(yylval.valor_string);
                                   }
   |ID                            {
                                   printf("Regla LISTA_VAR es id\n");
+								  cantVarsADeclarar=0;
                                   agregarVarATabla(yylval.valor_string);
-															    varADeclarar1 = fin_tabla; /* Guardo posicion de primer variable de esta lista de declaracion. */
-															    cantVarsADeclarar = 1;
+									varADeclarar1 = fin_tabla; /* Guardo posicion de primer variable de esta lista de declaracion. */
                                 }
 ;
 
 lista_tipos:
   lista_tipos COMA tipo_dato    {
                                   printf("Regla LISTA_TIPOS es lista_tipos,tipo_dato\n");
-                                  agregarTiposDatosATabla();
+                                  cantTipoDatoDeclarado++;
+								  agregarTiposDatosATabla();
                                 }
   |tipo_dato                    {
                                   printf("Regla LISTA_TIPOS es tipo_dato\n");
+								  cantTipoDatoDeclarado = 0;
                                   agregarTiposDatosATabla();
                                 }
   ;
@@ -365,10 +368,7 @@ void escribirNombreEnTabla(char* nombre, int pos){
 
 /** Agrega los tipos de datos a las variables declaradas. Usa las variables globales varADeclarar1, cantVarsADeclarar y tipoDatoADeclarar */
 void agregarTiposDatosATabla(){
-	int i;
-	for(i = 0; i < cantVarsADeclarar; i++){
-		tabla_simbolo[varADeclarar1 + i].tipo_dato = tipoDatoADeclarar;
-	}
+	tabla_simbolo[varADeclarar1 + cantTipoDatoDeclarado].tipo_dato = tipoDatoADeclarar;
 }
 
 /** Guarda la tabla de simbolos en un archivo de texto */

@@ -1,6 +1,6 @@
 NOMBRE                        |TIPO                          |VALOR                         |LONGITUD                      
 .........................................................................................................
-contador                      |FLOAT                         |--                            |--                            
+contador                      |INTEGER                       |--                            |--                            
 promedio                      |FLOAT                         |--                            |--                            
 actual                        |FLOAT                         |--                            |--                            
 suma                          |FLOAT                         |--                            |--                            
