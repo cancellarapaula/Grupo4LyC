@@ -130,7 +130,7 @@ programa:
                                     guardarTabla();
                                   }
 	|bloque						{
-                                    printf("Regla 1: PROGRAMA es bloque_declaracion bloque\n");
+                                    printf("Regla 1: PROGRAMA es bloque\n");
                                     printf("COMPILACION EXITOSA\n");
                                     guardarTabla();
                                   }
@@ -244,7 +244,7 @@ expresion:
 termino: 
   termino OP_MULT factor      {printf("Regla 36: TERMINO es termino*factor\n");}
 	|termino OP_DIVI factor     {printf("Regla 37: TERMINO es termino/factor\n");}
-  |factor                     {printf("Regla 38: FACTOR es factor\n");}
+  |factor                     {printf("Regla 38: TERMINO es factor\n");}
 ;
 
 factor:
@@ -273,33 +273,33 @@ factor:
 	|CTE_HEXA                   {
                                 printf("Regla 46: FACTOR es cte_hexa 1 1 \n");
                                 agregarCteHexaATabla(yylval.valor_string);
-								printf("Regla 47: FACTOR es cte_hexa 2\n");
+								
                               }
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C {printf("Regla 48: MAXIMO es maximo(lista_expresion)\n");}
+  MAXIMO P_A lista_expresion P_C {printf("Regla 47: MAXIMO es maximo(lista_expresion)\n");}
 ;
 
 lista_expresion:
-  lista_expresion COMA expresion {printf("Regla 49: LISTA_EXPRESION es lista_expresion,expresion\n");}
-  | expresion                     {printf("Regla 50: LISTA_EXPRESION es expresion\n");}
+  lista_expresion COMA expresion {printf("Regla 48: LISTA_EXPRESION es lista_expresion,expresion\n");}
+  | expresion                     {printf("Regla 49: LISTA_EXPRESION es expresion\n");}
 ;
 
 salida:
 	PUT CTE_STRING P_Y_C        {
-                                printf("Regla 51: SALIDA es PUT cte_string;\n");
+                                printf("Regla 50: SALIDA es PUT cte_string;\n");
                                 agregarCteStringATabla(yylval.valor_string);  
                               }
 	|PUT ID P_Y_C               {
                                 chequearVarEnTabla($2);
-                                printf("Regla 52: SALIDA es PUT id;\n");
+                                printf("Regla 51: SALIDA es PUT id;\n");
                               }
 ;
 
 entrada:
   GET ID P_Y_C                {
                                 chequearVarEnTabla($2);
-                                printf("Regla 53: ENTRADA es GET id;\n");
+                                printf("Regla 52: ENTRADA es GET id;\n");
                               }
 ;
 
