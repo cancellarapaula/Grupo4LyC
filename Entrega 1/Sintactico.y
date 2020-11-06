@@ -125,34 +125,34 @@
 %%
 programa:  	   	   
   bloque_declaracion bloque       {
-                                    printf("Regla 0: PROGRAMA es bloque_declaracion bloque\n");
+                                    printf("Regla PROGRAMA es bloque_declaracion bloque\n");
                                     printf("COMPILACION EXITOSA\n");
                                     guardarTabla();
                                   }
 	|bloque						{
-                                    printf("Regla 1: PROGRAMA es bloque\n");
+                                    printf("Regla PROGRAMA es bloque_declaracion bloque\n");
                                     printf("COMPILACION EXITOSA\n");
                                     guardarTabla();
                                   }
 ;  
 
 bloque_declaracion:         	        	
-  bloque_declaracion declaracion {printf("Regla 2: BLOQUE_DECLARACION es bloque_declaracion declaracion\n");}
-  |declaracion                   {printf("Regla 3: BLOQUE_DECLARACION es declaracion\n");}
+  bloque_declaracion declaracion {printf("Regla BLOQUE_DECLARACION es bloque_declaracion declaracion\n");}
+  |declaracion                   {printf("Regla BLOQUE_DECLARACION es declaracion\n");}
 ;
 
 declaracion:  
-  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR {printf("Regla 4: DECLARACION\n");}
+  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR {printf("Regla DECLARACION\n");}
 ;
 
 lista_var:  
   lista_var COMA ID              {
-                                  printf("Regla 5: LISTA_VAR es lista_var, ID\n");
+                                  printf("Regla LISTA_VAR es lista_var, ID\n");
 								  	cantVarsADeclarar++;
                                   	agregarVarATabla(yylval.valor_string);
                                   }
   |ID                            {
-                                  printf("Regla 6: LISTA_VAR es id\n");
+                                  printf("Regla LISTA_VAR es id\n");
 								  cantVarsADeclarar=0;
                                   agregarVarATabla(yylval.valor_string);
 									varADeclarar1 = fin_tabla; /* Guardo posicion de primer variable de esta lista de declaracion. */
@@ -161,12 +161,12 @@ lista_var:
 
 lista_tipos:
   lista_tipos COMA tipo_dato    {
-                                  printf("Regla 7: LISTA_TIPOS es lista_tipos,tipo_dato\n");
+                                  printf("Regla LISTA_TIPOS es lista_tipos,tipo_dato\n");
                                   cantTipoDatoDeclarado++;
 								  agregarTiposDatosATabla();
                                 }
   |tipo_dato                    {
-                                  printf("Regla 8: LISTA_TIPOS es tipo_dato\n");
+                                  printf("Regla LISTA_TIPOS es tipo_dato\n");
 								  cantTipoDatoDeclarado = 0;
                                   agregarTiposDatosATabla();
                                 }
@@ -174,132 +174,132 @@ lista_tipos:
 
 tipo_dato:
   INTEGER                       {
-                                  printf("Regla 9: TIPO_DATO es integer\n");
+                                  printf("Regla TIPO_DATO es integer\n");
                                   tipoDatoADeclarar = Integer;
                                 }
   |FLOAT                        {
-                                  printf("Regla 10: TIPO_DATO es float\n");
+                                  printf("Regla TIPO_DATO es float\n");
                                   tipoDatoADeclarar = Float;
                                 }
   |STRING                       {
-                                  printf("Regla 11: TIPO_DATO es string\n");
+                                  printf("Regla TIPO_DATO es string\n");
                                   tipoDatoADeclarar = String;
                                 }
 ;
 
 bloque: 
-  bloque sentencia              {printf("Regla 12: BLOQUE es bloque sentencia\n");}
-  |sentencia                    {printf("Regla 13: BLOQUE es sentencia\n");}
+  bloque sentencia              {printf("Regla BLOQUE es bloque sentencia\n");}
+  |sentencia                    {printf("Regla BLOQUE es sentencia\n");}
 ;
 
 sentencia:
-  ciclo                         {printf("Regla 14: SENTENCIA es ciclo\n");}
-  |if                           {printf("Regla 15: SENTENCIA es if\n");}
-  |asignacion                   {printf("Regla 16: SENTENCIA es asignacion\n");}
-  |salida                       {printf("Regla 17: SENTENCIA es salida\n");}
-  |entrada                      {printf("Regla 18: SENTENCIA es entrada\n");}
+  ciclo                         {printf("Regla SENTENCIA es ciclo\n");}
+  |if                           {printf("Regla SENTENCIA es if\n");}
+  |asignacion                   {printf("Regla SENTENCIA es asignacion\n");}
+  |salida                       {printf("Regla SENTENCIA es salida\n");}
+  |entrada                      {printf("Regla SENTENCIA es entrada\n");}
 ;
 
 ciclo:
-	WHILE P_A decision P_C LL_A bloque LL_C {printf("Regla 19: CICLO es while(decision){bloque}\n");}
+	WHILE P_A decision P_C LL_A bloque LL_C {printf("Regla CICLO es while(decision){bloque}\n");}
 ;
 
 asignacion: 
 	ID OP_ASIG expresion P_Y_C {
                                 chequearVarEnTabla($1);
-                                printf("Regla 20: ASIGNACION es id:=expresion;\n");
+                                printf("Regla ASIGNACION es id:=expresion;\n");
                               }
 ;
 
 if: 
-	IF P_A decision P_C LL_A bloque LL_C                        {printf("Regla 21: IF es if(decision){bloque}\n");}
-	|IF P_A decision P_C LL_A bloque LL_C ELSE LL_A bloque LL_C {printf("Regla 22: IF es if(decision){bloque} else {bloque}\n");}
+	IF P_A decision P_C LL_A bloque LL_C                        {printf("Regla IF es if(decision){bloque}\n");}
+	|IF P_A decision P_C LL_A bloque LL_C ELSE LL_A bloque LL_C {printf("Regla IF es if(decision){bloque} else {bloque}\n");}
 ;
 
 decision:
-  decision OP_LOGICO condicion {printf("Regla 23: DECISION ES decision op_logico condicion\n");}
-  |condicion                   {printf("Regla 24: DECISION es condicion\n");}
+  decision OP_LOGICO condicion {printf("Regla DECISION ES decision op_logico condicion\n");}
+  |condicion                   {printf("Regla DECISION es condicion\n");}
 ;
 
 condicion:
-  OP_NEGACION condicion           {printf("Regla 25: CONDICION es not condicion\n");}
-  |expresion comparador expresion {printf("Regla 26: CONDICION es expresion comparador expresion\n");}
+  OP_NEGACION condicion           {printf("Regla CONDICION es not condicion\n");}
+  |expresion comparador expresion {printf("Regla CONDICION es expresion comparador expresion\n");}
 ;
 
 comparador:
-  OP_IGUAL                    {printf("Regla 27: COMPARADOR ES =\n");}
-  |OP_DISTINTO                {printf("Regla 28: COMPARADOR ES <>\n");}
-  |OP_MENORIGUAL              {printf("Regla 29: COMPARADOR ES <=\n");}
-  |OP_MAYORIGUAL              {printf("Regla 30: COMPARADOR ES >=\n");}
-  |OP_MAYOR                   {printf("Regla 31: COMPARADOR ES >\n");}
-  |OP_MENOR                   {printf("Regla 32: COMPARADOR ES <\n");}
+  OP_IGUAL                    {printf("Regla COMPARADOR ES =\n");}
+  |OP_DISTINTO                {printf("Regla COMPARADOR ES <>\n");}
+  |OP_MENORIGUAL              {printf("Regla COMPARADOR ES <=\n");}
+  |OP_MAYORIGUAL              {printf("Regla COMPARADOR ES >=\n");}
+  |OP_MAYOR                   {printf("Regla COMPARADOR ES >\n");}
+  |OP_MENOR                   {printf("Regla COMPARADOR ES <\n");}
 ;
 
 expresion:
-  expresion OP_SUMA termino   {printf("Regla 33: EXPRESION es expresion+termino\n");}
-	|expresion OP_REST termino  {printf("Regla 34: EXPRESION es expresion-termino\n");}
-  |termino                    {printf("Regla 35: TERMINO es termino\n");}
+  expresion OP_SUMA termino   {printf("Regla EXPRESION es expresion+termino\n");}
+	|expresion OP_REST termino  {printf("Regla EXPRESION es expresion-termino\n");}
+  |termino                    {printf("Regla TERMINO es termino\n");}
 ;
 
 termino: 
-  termino OP_MULT factor      {printf("Regla 36: TERMINO es termino*factor\n");}
-	|termino OP_DIVI factor     {printf("Regla 37: TERMINO es termino/factor\n");}
-  |factor                     {printf("Regla 38: TERMINO es factor\n");}
+  termino OP_MULT factor      {printf("Regla TERMINO es termino*factor\n");}
+	|termino OP_DIVI factor     {printf("Regla TERMINO es termino/factor\n");}
+  |factor                     {printf("Regla FACTOR es factor\n");}
 ;
 
 factor:
-  P_A expresion P_C           {printf("Regla 39: FACTOR es (expresion)\n");}
-  |maximo                     {printf("Regla 40: FACTOR es maximo\n");}
+  P_A expresion P_C           {printf("Regla FACTOR es (expresion)\n");}
+  |maximo                     {printf("Regla FACTOR es maximo\n");}
 	|ID                         {
-                                printf("Regla 41: FACTOR es id\n");
+                                printf("Regla FACTOR es id\n");
                                 chequearVarEnTabla(yylval.valor_string);  
                               }
 	|CTE_STRING                 {
-                                printf("Regla 42: FACTOR es cte_string\n");
+                                printf("Regla FACTOR es cte_string\n");
                                 agregarCteStringATabla(yylval.valor_string);
                               }
 	|CTE_INT                    {
-                                printf("Regla 43: FACTOR es cte_int\n");
+                                printf("Regla FACTOR es cte_int\n");
                                 agregarCteIntATabla(yylval.valor_int);  
                               }
 	|CTE_REAL                   {
-                                printf("Regla 44: FACTOR es cte_real\n");
+                                printf("Regla FACTOR es cte_real\n");
                                 agregarCteRealATabla(yylval.valor_float);
 														  }
 	|CTE_BIN                    {
-                                printf("Regla 45: FACTOR es cte_bin\n");
+                                printf("Regla FACTOR es cte_bin\n");
                                 agregarCteBinariaATabla(yylval.valor_string);
                               }
 	|CTE_HEXA                   {
-                                printf("Regla 46: FACTOR es cte_hexa 1 1 \n");
+                                printf("Regla FACTOR es cte_hexa 1 1 \n");
                                 agregarCteHexaATabla(yylval.valor_string);
-								
+								printf("Regla FACTOR es cte_hexa 2\n");
                               }
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C {printf("Regla 47: MAXIMO es maximo(lista_expresion)\n");}
+  MAXIMO P_A lista_expresion P_C {printf("Regla MAXIMO es maximo(lista_expresion)\n");}
 ;
 
 lista_expresion:
-  lista_expresion COMA expresion {printf("Regla 48: LISTA_EXPRESION es lista_expresion,expresion\n");}
-  | expresion                     {printf("Regla 49: LISTA_EXPRESION es expresion\n");}
+  lista_expresion COMA expresion {printf("Regla LISTA_EXPRESION es lista_expresion,expresion\n");}
+  | expresion                     {printf("Regla LISTA_EXPRESION es expresion\n");}
 ;
 
 salida:
 	PUT CTE_STRING P_Y_C        {
-                                printf("Regla 50: SALIDA es PUT cte_string;\n");
+                                printf("Regla SALIDA es PUT cte_string;\n");
                                 agregarCteStringATabla(yylval.valor_string);  
                               }
 	|PUT ID P_Y_C               {
                                 chequearVarEnTabla($2);
-                                printf("Regla 51: SALIDA es PUT id;\n");
+                                printf("Regla SALIDA es PUT id;\n");
                               }
 ;
 
 entrada:
   GET ID P_Y_C                {
                                 chequearVarEnTabla($2);
-                                printf("Regla 52: ENTRADA es GET id;\n");
+                                printf("Regla ENTRADA es GET id;\n");
                               }
 ;
 
@@ -464,10 +464,10 @@ void guardarTabla(){
 			fprintf(arch, "|%-30s|%-30s|%-30d", "CTE_STRING",&(tabla_simbolo[i].valor_s), tabla_simbolo[i].longitud);
 			break;
     	case CteBinaria:
-			fprintf(arch, "|%-30s|%-30d|%-30s", "CTE_BINARIA",tabla_simbolo[i].valor_i, "--");
+			fprintf(arch, "|%-30s|%-30d|%-30d", "CTE_BINARIA",tabla_simbolo[i].valor_i, "--");
 			break;
     	case CteHexa:
-			fprintf(arch, "|%-30s|%-30d|%-30s", "CTE_HEXA",tabla_simbolo[i].valor_i, "--");
+			fprintf(arch, "|%-30s|%-30d|%-30d", "CTE_HEXA",tabla_simbolo[i].valor_i, "--");
 			break;
 		}
 
