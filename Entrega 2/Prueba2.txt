@@ -1,0 +1,14 @@
+DIM < contador,promedio,actual,suma> AS < Integer,Float,Float,Float >
+GET actual;
+GET contador;
+contador:= 0;
+suma:= 2;
+actual := 10.5;
+actual := 10;
+GET actual;
+while (contador <= 9) {
+    contador:= contador + 1;
+	actual:= (contador/0.342) + (contador* maximo (actual*contador, 2,
+    actual*suma,maximo (4,actual,2) ) );
+    suma:= suma + actual;
+}
