@@ -46,7 +46,8 @@ CTE_INT     	-?{DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO})*
 
 OP_ASIG   		":="
-OP_LOGICO		["and"|"or"]
+OP_AND			["and"|"AND"]
+OP_OR			["or"|"OR"]
 OP_NEGACION 	"not"
 OP_DISTINTO		"<>"
 OP_MAYORIGUAL	">="
@@ -196,7 +197,7 @@ AS				"AS"
 					printf("\nConstante entera: %s\n",yytext);
 					if(atoll(yytext)>=-32768 && atoll(yytext)<=32767)
 					{
-						yylval.valor_int = atoi(yytext);
+						yylval.valor_string = strdup(yytext);
 					}
 					else
 					{
@@ -209,7 +210,7 @@ AS				"AS"
 					printf("\nConstante real: %s\n",yytext);
 					if(atof(yytext)<=3.40282347e+38F)
 					{
-						yylval.valor_float = atof( yytext );
+						yylval.valor_string = strdup(yytext);
 					}
 					else{
 						mensajeDeError(2);
@@ -277,9 +278,13 @@ AS				"AS"
 					return OP_DISTINTO;
 				}
 			
-{OP_LOGICO}		{
-				printf("\nOperador logico: %s\n", yytext);
-				return OP_LOGICO;
+{OP_AND}		{
+				printf("\nOperador logico and: %s\n", yytext);
+				return OP_AND;
+				}
+{OP_OR}		{
+				printf("\nOperador logico or: %s\n", yytext);
+				return OP_OR;
 				}
 
 {COMENT} 

@@ -13,6 +13,7 @@
  *  Temas especiales: 
  *     1-Constante Binaria y Hexadecimal
  *	   2-Máximo
+ *	   3-Árbol Sintáctico
  *
  */
 %{
@@ -25,7 +26,7 @@
 #include "y.tab.h"
 
 	/* Tipos de datos para la tabla de simbolos */
-  #define Integer 1
+    #define Integer 1
 	#define Float 2
 	#define String 3
 	#define CteInt 4
@@ -39,6 +40,67 @@
 
 	int yylex();
 	
+	// estructura de nodos para arbol sintactico -----
+	struct nodo {
+	char *valor;
+	struct nodo *left;
+	struct nodo *right;
+	};
+
+	struct nodo *raiz = NULL;
+	struct nodo *AsigP = NULL;
+	struct nodo *ExpP = NULL;
+	struct nodo *AuxExpP = NULL;
+	struct nodo *TermP = NULL;
+	struct nodo *FactP = NULL;
+
+	struct nodo *IFp = NULL;
+	struct nodo *DecisionP = NULL;
+	struct nodo *AuxDecisionP = NULL;
+	struct nodo *CondP = NULL;
+	struct nodo *AuxCondP = NULL;
+	struct nodo *BloqueSentP = NULL;
+	struct nodo *AuxBloqueSentP = NULL;
+	struct nodo *BloqueIntP = NULL;
+	struct nodo *BSi = NULL;
+	struct nodo *BSd = NULL;
+	struct nodo *SentP = NULL;
+	struct nodo *CicloP = NULL;
+	struct nodo *EntradaP = NULL;
+	struct nodo *SalidaP = NULL;
+	struct nodo *ListaP = NULL;
+	struct nodo *AuxListaP = NULL;
+	struct nodo *MaximoP = NULL;
+
+	struct nodo *crearHojaArbol(char *);
+	struct nodo *crearNodoArbol(char *, struct nodo *, struct nodo *);
+
+	char* _comparacion;
+	char* _decision;
+
+	//------------------------------------------------
+	struct Stack {
+		int top;
+		unsigned capacity;
+		struct nodo** array;
+	};
+
+	struct Stack *stackDecision;
+	struct Stack *stackParentesis;
+
+	struct Stack* createStack(unsigned capacity);
+	int isFull(struct Stack* stack);
+	int isEmpty(struct Stack* stack);
+	void push(struct Stack* stack, struct nodo *item);
+	struct nodo* pop(struct Stack* stack);
+	struct nodo *desapilar(struct Stack* stack, struct nodo* fp);
+
+	//------------------------------------------------
+	/*graph */
+	void addDot (struct nodo *raiz);
+	void crearArchivoDot(struct nodo * raiz);
+	char* strReplace(char* search, char* replace, char* subject);
+
 	/* Funciones necesarias */
 	int yyerror(char* mensaje);
 	void agregarVarATabla(char* nombre);
@@ -55,6 +117,7 @@
 
 	int yystopparser=0;
 	FILE  *yyin;
+	FILE* archIntermedia = NULL;
 
 	/* Estructura de tabla de simbolos */
 	typedef struct {
@@ -79,90 +142,9 @@
 
   /* Tipo de estructura de datos*/
   %union {
-    int valor_int;
-    float valor_float;
     char *valor_string;
   }
   
-  
-  // estructura de nodos para arbol sintactico -----
-struct node {
-  char *value;
-  struct node *left;
-  struct node *right;
-};
-
-struct node *root = NULL;
-struct node *AsignacionP = NULL;
-struct node *ConstanteP = NULL;
-struct node *AuxConstanteP = NULL;
-struct node *ExpresionP = NULL;
-struct node *AuxExpresionP = NULL;
-struct node *AuxExpresion2P = NULL;
-struct node *AuxExpresion3P = NULL;
-struct node *TerminoP = NULL;
-struct node *AuxTerminoP = NULL;
-struct node *FactorP = NULL;
-
-struct node *IFp = NULL;
-struct node *DecisionP = NULL;
-struct node *CondicionP = NULL;
-struct node *AuxCondicionP = NULL;
-struct node *OperasignaP = NULL;
-struct node *AuxOperasignaP = NULL;
-struct node *BloqueSentenciaP = NULL;
-struct node *AuxBloqueSentenciaP = NULL;
-struct node *BloqueInternoP = NULL;
-struct node *AuxBloqueInternoP = NULL;
-struct node *BSi = NULL;
-struct node *BSd = NULL;
-struct node *SentenciaP = NULL;
-struct node *CicloP = NULL;
-struct node *EntradaP = NULL;
-struct node *SalidaP = NULL;
-struct node *ListaP = NULL;
-struct node *AuxListaP = NULL;
-struct node *MaximoP = NULL;
-
-struct node *crearHoja(char *);
-struct node *crearNodo(char *, struct node *, struct node *);
-
-void _print_h(struct node *, int);
-void print_h(struct node *);
-
-char* _comparacion;
-
-//------------------------------------------------
-struct Stack {
-    int top;
-    unsigned capacity;
-    struct node** array;
-};
-
-struct Stack *stackDecision;
-struct Stack *stackParentesis;
-
-struct Stack* createStack(unsigned capacity);
-int isFull(struct Stack* stack);
-int isEmpty(struct Stack* stack);
-void push(struct Stack* stack, struct node *item);
-struct node* pop(struct Stack* stack);
-struct node *desapilar(struct Stack* stack, struct node* fp);
-
-// estructura para la tabla de simbolos ----------
-typedef struct {
-	char nombre[30];
-	char tipo[10];
-	char valor[30];
-	int longitud;
-	int es_const;
-} t_ts;
-//------------------------------------------------
-/*graph */
-void addDot (struct node *root);
-void crearArchivoDot(struct node * root);
-char* strReplace(char* search, char* replace, char* subject);
-
 %token P_Y_C
 %token COMA
 %token P_A 
@@ -180,10 +162,11 @@ char* strReplace(char* search, char* replace, char* subject);
 %token OP_MAYORIGUAL
 %token OP_MENORIGUAL
 %token OP_DISTINTO
-%token OP_LOGICO
+%token OP_AND
+%token OP_OR
 %token OP_NEGACION
-%token <valor_int>CTE_INT
-%token <valor_float>CTE_REAL
+%token <valor_string>CTE_INT
+%token <valor_string>CTE_REAL
 %token <valor_string>CTE_BIN
 %token <valor_string>CTE_HEXA
 %token <valor_string>CTE_STRING
@@ -201,38 +184,42 @@ char* strReplace(char* search, char* replace, char* subject);
 %token MAXIMO
 %token <valor_string>ID
 
+%start start
+
 %%
+start: programa                   {
+									printf("Regla 0: START es programa\n");
+									printf("\n\nCOMPILACION EXITOSA\n\n");
+                                    guardarTabla();
+								}
 programa:  	   	   
   bloque_declaracion bloque       {
-                                    printf("Regla 0: PROGRAMA es bloque_declaracion bloque\n");
-                                    printf("COMPILACION EXITOSA\n");
-                                    guardarTabla();
+                                    printf("Regla 1: PROGRAMA es bloque_declaracion bloque\n");
+									raiz = BloqueSentP;
                                   }
 	|bloque						{
-                                    printf("Regla 1: PROGRAMA es bloque\n");
-                                    printf("COMPILACION EXITOSA\n");
-									guardarTabla();
+                                    printf("Regla 2: PROGRAMA es bloque\n");
+									raiz = BloqueSentP;
                                   }
-	{ root = BloqueSentenciaP; }
 ;  
 
 bloque_declaracion:         	        	
-  bloque_declaracion declaracion {printf("Regla 2: BLOQUE_DECLARACION es bloque_declaracion declaracion\n");}
-  |declaracion                   {printf("Regla 3: BLOQUE_DECLARACION es declaracion\n");}
+  bloque_declaracion declaracion {printf("Regla 3: BLOQUE_DECLARACION es bloque_declaracion declaracion\n");}
+  |declaracion                   {printf("Regla 4: BLOQUE_DECLARACION es declaracion\n");}
 ;
 
 declaracion:  
-  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR {printf("Regla 4: DECLARACION\n");}
+  DIM OP_MENOR lista_var OP_MAYOR AS OP_MENOR lista_tipos OP_MAYOR {printf("Regla 5: DECLARACION\n");}
 ;
 
 lista_var:  
   lista_var COMA ID              {
-                                  printf("Regla 5: LISTA_VAR es lista_var, ID\n");
+                                  printf("Regla 6: LISTA_VAR es lista_var, ID\n");
 								  	cantVarsADeclarar++;
                                   	agregarVarATabla(yylval.valor_string);
                                   }
   |ID                            {
-                                  printf("Regla 6: LISTA_VAR es id\n");
+                                  printf("Regla 7: LISTA_VAR es id\n");
 								  cantVarsADeclarar=0;
                                   agregarVarATabla(yylval.valor_string);
 									varADeclarar1 = fin_tabla; /* Guardo posicion de primer variable de esta lista de declaracion. */
@@ -241,12 +228,12 @@ lista_var:
 
 lista_tipos:
   lista_tipos COMA tipo_dato    {
-                                  printf("Regla 7: LISTA_TIPOS es lista_tipos,tipo_dato\n");
+                                  printf("Regla 8: LISTA_TIPOS es lista_tipos,tipo_dato\n");
                                   cantTipoDatoDeclarado++;
 								  agregarTiposDatosATabla();
                                 }
   |tipo_dato                    {
-                                  printf("Regla 8: LISTA_TIPOS es tipo_dato\n");
+                                  printf("Regla 9: LISTA_TIPOS es tipo_dato\n");
 								  cantTipoDatoDeclarado = 0;
                                   agregarTiposDatosATabla();
                                 }
@@ -254,250 +241,373 @@ lista_tipos:
 
 tipo_dato:
   INTEGER                       {
-                                  printf("Regla 9: TIPO_DATO es integer\n");
+                                  printf("Regla 10: TIPO_DATO es integer\n");
                                   tipoDatoADeclarar = Integer;
                                 }
   |FLOAT                        {
-                                  printf("Regla 10: TIPO_DATO es float\n");
+                                  printf("Regla 11: TIPO_DATO es float\n");
                                   tipoDatoADeclarar = Float;
                                 }
   |STRING                       {
-                                  printf("Regla 11: TIPO_DATO es string\n");
+                                  printf("Regla 12: TIPO_DATO es string\n");
                                   tipoDatoADeclarar = String;
                                 }
 ;
 
 bloque: 
-  bloque { AuxBloqueSentenciaP = BloqueSentenciaP; } sentencia
-								{printf("Regla 12: BLOQUE es bloque sentencia\n");
-								BloqueSentenciaP = crearNodo("BS", AuxBloqueSentenciaP, SentenciaP);}
-  |sentencia                    {printf("Regla 13: BLOQUE es sentencia\n"); BloqueSentenciaP = SentenciaP;}
+  bloque { AuxBloqueSentP = BloqueSentP; } sentencia
+								{
+									printf("Regla 13: BLOQUE es bloque sentencia\n");
+									BloqueSentP = crearNodoArbol("BS", AuxBloqueSentP, SentP);
+								}
+  |sentencia                    {
+	  								printf("Regla 14: BLOQUE es sentencia\n"); 
+									BloqueSentP = SentP;
+								}
 ;
 
 sentencia:
-  ciclo                         {printf("Regla 14: SENTENCIA es ciclo\n");} {SentenciaP = CicloP;}
-  |if                           {printf("Regla 15: SENTENCIA es if\n");} {SentenciaP = IFp;}
-  |asignacion                   {printf("Regla 16: SENTENCIA es asignacion\n");} {SentenciaP = AsignacionP;}                
-  |salida                       {printf("Regla 17: SENTENCIA es salida\n");} {SentenciaP = SalidaP;}
-  |entrada                      {printf("Regla 18: SENTENCIA es entrada\n");} {SentenciaP = EntradaP;}             
+  ciclo                         {
+	  								printf("Regla 15: SENTENCIA es ciclo\n");
+  									SentP = CicloP;}
+  |if                           {
+	  								printf("Regla 16: SENTENCIA es if\n");
+									SentP = IFp;
+								}
+  |asignacion                   {
+	  								printf("Regla 17: SENTENCIA es asignacion\n");
+									SentP = AsigP;
+								}                
+  |salida                       {
+									printf("Regla 18: SENTENCIA es salida\n");
+									SentP = SalidaP;
+								}
+  |entrada                      {
+	  								printf("Regla 19: SENTENCIA es entrada\n");
+									SentP = EntradaP;
+								}             
 ;
 
 ciclo:
-	WHILE P_A decision P_C LL_A bloque LL_C {printf("Regla 19: CICLO es while(decision){bloque}\n");
-											DecisionP = desapilar(stackDecision, DecisionP); 
-											CicloP = crearNodo("while", DecisionP, BloqueInternoP);}
+	WHILE P_A decision P_C LL_A bloque LL_C {
+												printf("Regla 20: CICLO es while(decision){bloque}\n");
+												DecisionP = desapilar(stackDecision, DecisionP); 
+												CicloP = crearNodoArbol("while", DecisionP, BloqueIntP);
+											}
 ;
 
 asignacion: 
 	ID OP_ASIG expresion P_Y_C {
                                 chequearVarEnTabla($1);
-                                printf("Regla 20: ASIGNACION es id:=expresion;\n");
-								AsignacionP = crearNodo(":=", crearHoja($1), ExpresionP);
+                                printf("Regla 21: ASIGNACION es id:=expresion; ExpP-> valor:%s<- \n", ExpP->valor);
+								AsigP = crearNodoArbol(":=", crearHojaArbol($1), ExpP);
                               }
 ;
 
 if: 
-	IF P_A decision P_C LL_A bloque LL_C                        {printf("Regla 21: IF es if(decision){bloque}\n");
-																DecisionP = desapilar(stackDecision, DecisionP);  
-																IFp = crearNodo("if", DecisionP, BloqueInternoP);}
-	|IF P_A decision P_C LL_A bloque LL_C { BSd = BloqueInternoP; } ELSE LL_A bloque LL_C { BSi = BloqueInternoP; }
-											{printf("Regla 22: IF es if(decision){bloque} else {bloque}\n");
-											DecisionP = desapilar(stackDecision, DecisionP);
-											struct node *cuerpo = crearNodo("cuerpo", BSd, BSi);
-											IFp = crearNodo("if", DecisionP, cuerpo);}
+	IF P_A decision P_C LL_A bloque LL_C	{
+												printf("Regla 22: IF es if(decision){bloque}\n");
+												DecisionP = desapilar(stackDecision, DecisionP);  
+												IFp = crearNodoArbol("if", DecisionP, BloqueIntP);
+											}
+	|IF P_A decision P_C LL_A bloque LL_C	{ BSd = BloqueIntP; } ELSE LL_A bloque LL_C { BSi = BloqueIntP; }
+											{
+												printf("Regla 23: IF es if(decision){bloque} else {bloque}\n");
+												DecisionP = desapilar(stackDecision, DecisionP);
+												struct nodo *cuerpo = crearNodoArbol("cuerpo", BSd, BSi);
+												IFp = crearNodoArbol("if", DecisionP, cuerpo);
+											}
 ;
 
 decision:
-  decision {AuxDecisionP = DecisionP;} OP_LOGICO condicion {printf("Regla 23: DECISION ES decision op_logico condicion\n");
-															DecisionP = crearNodo(OP_LOGICO, AuxCondicionP, CondicionP);
-															push(stackDecision, DecisionP);
-}
-  |condicion                   {printf("Regla 24: DECISION es condicion\n"); DecisionP = CondicionP; push(stackDecision, DecisionP);}
+  decision {AuxDecisionP = DecisionP;} logico condicion {
+	  															printf("Regla 24: DECISION ES decision op_logico condicion\n");
+																DecisionP = crearNodoArbol(_decision, AuxCondP, CondP);
+																push(stackDecision, DecisionP);
+															}
+  |condicion                   {
+	  								printf("Regla 25: DECISION es condicion\n"); 
+									DecisionP = CondP;
+									push(stackDecision, DecisionP);
+								}
 ;
 
+logico:
+  OP_AND						{printf("Regla 26: LOGICO es and\n");{_decision = "AND";}}
+  |OP_OR						{printf("Regla 27: LOGICO es or\n");{_decision = "OR";}}
+;
 condicion:
-  OP_NEGACION condicion           {printf("Regla 25: CONDICION es not condicion\n"); CondicionP = crearNodo(“NOT”, CondicionP, CondicionP);}
-  |expresion {AuxExpresionP = ExpresionP;} comparador expresion {printf("Regla 26: CONDICION es expresion comparador expresion\n");
-																 CondicionP = crearNodo(_comparacion, AuxExpresionP, ExpresionP);}
+  OP_NEGACION condicion			{
+	  								printf("Regla 28: CONDICION es not condicion\n"); 
+									CondP = crearNodoArbol("NOT", CondP, CondP);
+								}
+  |expresion {AuxExpP = ExpP;} comparador expresion {
+	  													printf("Regla 29: CONDICION es expresion comparador expresion\n");
+														CondP = crearNodoArbol(_comparacion, AuxExpP, ExpP);
+													}
 ;
 
 comparador:
-  OP_IGUAL                    {printf("Regla 27: COMPARADOR ES =\n");{_comparacion = "==";}}
-  |OP_DISTINTO                {printf("Regla 28: COMPARADOR ES <>\n"); {_comparacion = "<>";}}
-  |OP_MENORIGUAL              {printf("Regla 29: COMPARADOR ES <=\n"); {_comparacion = "<=";}}
-  |OP_MAYORIGUAL              {printf("Regla 30: COMPARADOR ES >=\n"); {_comparacion = ">=";}}
-  |OP_MAYOR                   {printf("Regla 31: COMPARADOR ES >\n");{_comparacion = ">";}}
-  |OP_MENOR                   {printf("Regla 32: COMPARADOR ES <\n"); {_comparacion = "<";}	}
+  OP_IGUAL                    {printf("Regla 30: COMPARADOR ES =\n");{_comparacion = "==";}}
+  |OP_DISTINTO                {printf("Regla 31: COMPARADOR ES <>\n"); {_comparacion = "<>";}}
+  |OP_MENORIGUAL              {printf("Regla 32: COMPARADOR ES <=\n"); {_comparacion = "<=";}}
+  |OP_MAYORIGUAL              {printf("Regla 33: COMPARADOR ES >=\n"); {_comparacion = ">=";}}
+  |OP_MAYOR                   {printf("Regla 34: COMPARADOR ES >\n");{_comparacion = ">";}}
+  |OP_MENOR                   {printf("Regla 35: COMPARADOR ES <\n"); {_comparacion = "<";}	}
 ;
 
 expresion:
-  expresion { push(stackParentesis, ExpresionP); } OP_SUMA termino   {printf("Regla 33: EXPRESION es expresion+termino\n");
-																	ExpresionP = desapilar(stackParentesis, ExpresionP);
-																	ExpresionP = crearNodo("+", ExpresionP, TerminoP);}
-	|expresion{ push(stackParentesis, ExpresionP); }  OP_REST termino  {printf("Regla 34: EXPRESION es expresion-termino\n");
-																		ExpresionP = desapilar(stackParentesis, ExpresionP);
-																		ExpresionP = crearNodo("-", ExpresionP, TerminoP);}
-  |termino                    {printf("Regla 35: TERMINO es termino\n"); ExpresionP = TerminoP;}
+  expresion { push(stackParentesis, ExpP); } OP_SUMA termino   {
+	  																printf("Regla 36: EXPRESION es expresion+termino\n");
+																	ExpP = desapilar(stackParentesis, ExpP);
+																	ExpP = crearNodoArbol("+", ExpP, TermP);
+																}
+	|expresion{push(stackParentesis, ExpP); }  OP_REST termino  {
+																	printf("Regla 37: EXPRESION es expresion-termino\n");
+																	ExpP = desapilar(stackParentesis, ExpP);
+																	ExpP = crearNodoArbol("-", ExpP, TermP);
+																}
+  |termino                   {
+	  							printf("Regla 38: EXPRESION es termino\n"); 
+  								ExpP = TermP;
+							}
 ;
 
 termino: 
-  termino { push(stackParentesis, TerminoP); }OP_MULT factor      {printf("Regla 36: TERMINO es termino*factor\n");
-																	TerminoP = desapilar(stackParentesis, TerminoP);
-																	TerminoP = crearNodo("*", TerminoP, FactorP);}
-	|termino{push(stackParentesis, TerminoP) ;}  OP_DIVI factor     {printf("Regla 37: TERMINO es termino/factor\n");
-																	TerminoP = desapilar(stackParentesis, TerminoP);
-																	TerminoP = crearNodo("/", TerminoP, FactorP);}
-    |factor                     {printf("Regla 38: TERMINO es factor\n"); TerminoP = FactorP;}
+  termino { push(stackParentesis, TermP); } OP_MULT factor      {
+	  																printf("Regla 39: TERMINO es termino*factor\n");
+																	TermP = desapilar(stackParentesis, TermP);
+																	TermP = crearNodoArbol("*", TermP, FactP);
+																}
+	|termino{push(stackParentesis, TermP) ;} OP_DIVI factor     {
+																	printf("Regla 40: TERMINO es termino/factor\n");
+																	TermP = desapilar(stackParentesis, TermP);
+																	TermP = crearNodoArbol("/", TermP, FactP);
+																}
+    |factor                     {
+									printf("Regla 41: TERMINO es factor\n"); 
+									TermP = FactP;
+								}
 ;
 
 factor:
-  P_A expresion P_C           {printf("Regla 39: FACTOR es (expresion)\n");} FactorP = ExpresionP;    
-  |maximo                     {printf("Regla 40: FACTOR es maximo\n");} FactorP =MaximoP;
+  P_A expresion P_C				{printf("Regla 42: FACTOR es (expresion)\n");FactP = ExpP;  }  
+	|maximo						{printf("Regla 43: FACTOR es maximo\n"); FactP =MaximoP;} 
 	|ID                         {
-                                printf("Regla 41: FACTOR es id\n");
-                                chequearVarEnTabla(yylval.valor_string);  
-                              }
-							  {FactorP = crearHoja(yylval.valor_string);}
-	|CTE_STRING                 {
-                                printf("Regla 42: FACTOR es cte_string\n");
-                                agregarCteStringATabla(yylval.valor_string);
-                              }
-							  {FactorP = crearHoja(yylval.valor_string);}
-	|CTE_INT                    {
-                                printf("Regla 43: FACTOR es cte_int\n");
-                                agregarCteIntATabla(yylval.valor_int);  
-                              }
-							  {FactorP = crearHoja(yylval.valor_int);}
-	|CTE_REAL                   {
-                                printf("Regla 44: FACTOR es cte_real\n");
-                                agregarCteRealATabla(yylval.valor_float);
+                                	printf("Regla 44: FACTOR es id\n");
+                                	chequearVarEnTabla(yylval.valor_string);  
+                            		FactP = crearHojaArbol(yylval.valor_string);
 								}
-								{FactorP = crearHoja(yylval.valor_float);}
+	|CTE_STRING                 {
+									printf("Regla 45: FACTOR es cte_string\n");
+									agregarCteStringATabla(yylval.valor_string);
+                            		FactP = crearHojaArbol(yylval.valor_string);
+								}
+	|CTE_INT                    {
+									printf("Regla 46: FACTOR es cte_int\n");
+									agregarCteIntATabla(atoi(yylval.valor_string));  
+									FactP = crearHojaArbol(yylval.valor_string);
+									printf("-crea el nodo FactP: %s\n", FactP->valor);
+								}
+	|CTE_REAL                   {
+									printf("Regla 47: FACTOR es cte_real\n");
+									agregarCteRealATabla(atof(yylval.valor_string));
+									FactP = crearHojaArbol(yylval.valor_string);
+									printf("-crea el nodo FactP: %s\n", FactP->valor);
+								}
 	|CTE_BIN                    {
-                                printf("Regla 45: FACTOR es cte_bin\n");
-                                agregarCteBinariaATabla(yylval.valor_string);
-                              }
-							  {FactorP = crearHoja(yylval.valor_string);}
+									printf("Regla 48: FACTOR es cte_bin\n");
+									agregarCteBinariaATabla(yylval.valor_string);
+									FactP = crearHojaArbol(yylval.valor_string);
+								}
 	|CTE_HEXA                   {
-                                printf("Regla 46: FACTOR es cte_hexa 1 1 \n");
-                                agregarCteHexaATabla(yylval.valor_string);
-								
-                              }
-							  {FactorP = crearHoja(yylval.valor_string);}
+                                	printf("Regla 49: FACTOR es cte_hexa\n");
+                                	agregarCteHexaATabla(yylval.valor_string);
+									FactP = crearHojaArbol(yylval.valor_string);
+								}
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C {printf("Regla 47: MAXIMO es maximo(lista_expresion)\n");}
+  MAXIMO P_A lista_expresion P_C {printf("Regla 50: MAXIMO es maximo(lista_expresion)\n");}
 ;
 
 lista_expresion:
-  lista_expresion  { AuxListaP = ListaP; } COMA expresion {printf("Regla 48: LISTA_EXPRESION es lista_expresion,expresion\n");
-														struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
-														struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
-														struct node *condicion = crearNodo("if", compara, aumenta);
-														ListaP = crearNodo("Lista", AuxListaP, condicion);}
-  | expresion                     {printf("Regla 49: LISTA_EXPRESION es expresion\n");
-								    struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
-									struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
-									ListaP = crearNodo("if", compara, aumenta);}
+  lista_expresion  { AuxListaP = ListaP; } COMA expresion {
+	  													printf("Regla 51: LISTA_EXPRESION es lista_expresion,expresion\n");
+														struct nodo *compara = crearNodoArbol("==", crearHojaArbol("@aux"), ExpP);
+														struct nodo *aumenta = crearNodoArbol("+=", crearHojaArbol("@cont"), crearHojaArbol("1"));
+														struct nodo *condicion = crearNodoArbol("if", compara, aumenta);
+														ListaP = crearNodoArbol("Lista", AuxListaP, condicion);
+														}
+  | expresion					{
+	  								printf("Regla 52: LISTA_EXPRESION es expresion\n");
+								    struct nodo *compara = crearNodoArbol("==", crearHojaArbol("@aux"), ExpP);
+									struct nodo *aumenta = crearNodoArbol("+=", crearHojaArbol("@cont"), crearHojaArbol("1"));
+									ListaP = crearNodoArbol("if", compara, aumenta);
+								}
 ;
 
 salida:
-	PUT CTE_STRING P_Y_C        {
-                                printf("Regla 50: SALIDA es PUT cte_string;\n");
-                                agregarCteStringATabla(yylval.valor_string);  
-								SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.valor_string));
-                              }
+	PUT CTE_STRING P_Y_C		{
+									printf("Regla 53: SALIDA es PUT cte_string;\n");
+									agregarCteStringATabla(yylval.valor_string);  
+									SalidaP = crearNodoArbol("IO", crearHojaArbol("out"), crearHojaArbol(yylval.valor_string));
+                            	}
 	|PUT ID P_Y_C               {
-                                chequearVarEnTabla($2);
-                                printf("Regla 51: SALIDA es PUT id;\n");
-								SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.valor_string));   
-                              }
+									chequearVarEnTabla($2);
+									printf("Regla 54: SALIDA es PUT id;\n");
+									SalidaP = crearNodoArbol("IO", crearHojaArbol("out"), crearHojaArbol(yylval.valor_string));   
+                            	}
 ;
 
 entrada:
   GET ID P_Y_C                {
-                                chequearVarEnTabla($2);
-                                printf("Regla 52: ENTRADA es GET id;\n");
-								EntradaP = crearNodo("IO", crearHoja("in"), crearHoja(yylval.valor_string));
+                            	chequearVarEnTabla($2);
+                                printf("Regla 55: ENTRADA es GET id;\n");
+								EntradaP = crearNodoArbol("IO", crearHojaArbol("in"), crearHojaArbol(yylval.valor_string));
                               }
 ;
 
 %%
 // ----------------------------------------------------------------------------------
 
-struct node *desapilar(struct Stack* stack, struct node* fp){
-  struct node *n = pop(stack);
+struct nodo *desapilar(struct Stack* stack, struct nodo* fp){
+  struct nodo *n = pop(stack);
   if(n) return n;
   return fp;
 }
 
-struct node *crearHoja(char *nombre){
-	return crearNodo(nombre, NULL, NULL);
+struct nodo *crearHojaArbol(char *nombre){
+	return crearNodoArbol(nombre, NULL, NULL);
 }
 
-struct node *crearNodo(char *nombre, struct node *left, struct node *right){
-	struct node *hoja;
-	hoja = (struct node *) malloc(sizeof(struct node));
+struct nodo *crearNodoArbol(char *nombre, struct nodo *left, struct nodo *right){
+	struct nodo *hoja;
+	hoja = (struct nodo *) malloc(sizeof(struct nodo));
 
-	struct node *izq = NULL;
-	struct node *der = NULL;
+	struct nodo *izq = NULL;
+	struct nodo *der = NULL;
 
 	if(left != NULL && right != NULL){
 		izq = left;
 		der = right;
 	}
 
-	(hoja)->value = nombre;
+	(hoja)->valor = nombre;
 	(hoja)->right = der;
 	(hoja)->left  = izq;
 
 	return hoja;
 }
 
-void _print_h(struct node *root, int space) {
-	int i;
-  if (root == NULL) return;
-  space += COUNT;
-  _print_h(root->right, space);
-  printf("\n");
-  for (i = COUNT; i < space; i++) printf(" ");
-  printf("%p %s \n", root,root->value);
-  _print_h(root->left, space);
-}
+void crearArchivoDot(struct nodo * raiz){
+	archIntermedia = fopen("intermedia.dot","w");
+	fprintf(archIntermedia, " ");
+	archIntermedia = fopen("intermedia.dot", "a");
+	fprintf(archIntermedia, " digraph G { \n");
 
-void print_h(struct node *root){
-  _print_h(root, 0);
-  printf("\n\n");
-}
-
-void crearArchivoDot(struct node * root){
-	fp = fopen("intermedia.dot","w");
-	fprintf(fp, " ");
-	fp = fopen("intermedia.dot", "a");
-	fprintf(fp, " digraph G { \n");
-
-	addDot (root);
-	fprintf(fp,"}");
-    fclose(fp);
+	addDot (raiz);
+	fprintf(archIntermedia,"}");
+    fclose(archIntermedia);
 	const char * cmd1 = " dot intermedia.dot -Tpng -o intermedia.png ";
 	system(cmd1);
 }
 
 /*Agrega nodo a .dot*/
-void addDot (struct node *root) {
-  if (root == NULL) return;
-  char* value;
-	if (root -> left != NULL){
-    value = strReplace("\"", "'", root->left->value);
-		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,value);
-    	addDot(root->left);
+void addDot (struct nodo *raiz) {	
+  if (raiz == NULL) return;
+  char* valor;
+	if (raiz -> left != NULL){
+    	valor = strReplace("\"", "'", raiz->left->valor);
+		fprintf(archIntermedia, "\"%p_%s\"->\"%p_%s\" \n",raiz,raiz->valor, raiz->left,valor);
+    	addDot(raiz->left);
 	}
-	if (root -> right != NULL){
-    value = strReplace("\"", "'", root->right->value);
-		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->right,value);
-		addDot(root->right);
+	if (raiz -> right != NULL){
+    	valor = strReplace("\"", "'", raiz->right->valor);
+		fprintf(archIntermedia, "\"%p_%s\"->\"%p_%s\" \n",raiz,raiz->valor, raiz->right,valor);
+		addDot(raiz->right);
 	}
 }
+
+// Funciones de pila de punteros  ----------------------------------------
+struct Stack* createStack(unsigned capacity) {
+  struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+  stack->capacity = capacity;
+  stack->top = -1;
+  stack->array = (struct nodo**)malloc(stack->capacity * sizeof(struct nodo));
+  return stack;
+}
+
+int isFull(struct Stack* stack) {
+  return stack->top == stack->capacity - 1;
+}
+
+int isEmpty(struct Stack* stack) {
+  return stack->top == -1;
+}
+
+void push(struct Stack* stack, struct nodo *item) {
+  if (isFull(stack)) return;
+  stack->array[++stack->top] = item;
+}
+
+struct nodo* pop(struct Stack* stack) {
+  if (isEmpty(stack)) return NULL;
+  return stack->array[stack->top--];
+}
+
+char* strReplace(char* search, char* replace, char* subject) {
+	int i, j, k;
+
+	int searchSize = strlen(search);
+	int replaceSize = strlen(replace);
+	int size = strlen(subject);
+
+	char* ret;
+
+	if (!searchSize) {
+		ret = malloc(size + 1);
+		for (i = 0; i <= size; i++) {
+			ret[i] = subject[i];
+		}
+		return ret;
+	}
+
+	int retAllocSize = (strlen(subject) + 1) * 2;
+	ret = malloc(retAllocSize);
+
+	int bufferSize = 0;
+	char* foundBuffer = malloc(searchSize);
+
+	for (i = 0, j = 0; i <= size; i++) {
+		if (retAllocSize <= j + replaceSize) {
+			retAllocSize *= 2;
+			ret = (char*) realloc(ret, retAllocSize);
+		}
+		else if (subject[i] == search[bufferSize]) {
+			foundBuffer[bufferSize] = subject[i];
+			bufferSize++;
+
+			if (bufferSize == searchSize) {
+				bufferSize = 0;
+				for (k = 0; k < replaceSize; k++) {
+					ret[j++] = replace[k];
+				}
+			}
+		}
+		else {
+			for (k = 0; k < bufferSize; k++) {
+				ret[j++] = foundBuffer[k];
+			}
+			bufferSize = 0;
+
+			ret[j++] = subject[i];
+		}
+	}
+
+	free(foundBuffer);
+	return ret;
+}
+
 //---------------------principal 
 
 int main(int argc,char *argv[])
@@ -512,7 +622,11 @@ int main(int argc,char *argv[])
   }
   else
   {
-	  yyparse();
+	stackDecision = createStack(100);
+    stackParentesis = createStack(100);
+	yyparse();
+
+	crearArchivoDot(raiz);
     fclose(yyin);
   }
   return 0;

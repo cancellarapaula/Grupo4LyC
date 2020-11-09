@@ -4,12 +4,7 @@ PUT "Ing entero para actual: ";
 GET actual;
 contador:= 0;
 suma:= 02.5+0xA2B0;
-while (contador <= 9) {
-    contador:= contador + 1;
-    actual:= (contador/0.342) + (contador* maximo (actual*contador, 2,
-    actual,maximo (4,actual,0b111010) ) );
-    suma:= suma + actual;
-}
+
 PUT "La suma es: ";
 PUT suma;
 if (actual > 0b10){
