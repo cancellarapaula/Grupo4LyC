@@ -434,16 +434,16 @@ maximo:
 lista_expresion:
   lista_expresion  { AuxListaP = ListaP; } COMA expresion {
 	  													printf("Regla 51: LISTA_EXPRESION es lista_expresion,expresion\n");
-														struct nodo *compara = crearNodoArbol("==", crearHojaArbol("@aux"), ExpP);
-														struct nodo *aumenta = crearNodoArbol("+=", crearHojaArbol("@cont"), crearHojaArbol("1"));
-														struct nodo *condicion = crearNodoArbol("if", compara, aumenta);
-														ListaP = crearNodoArbol("Lista", AuxListaP, condicion);
+														struct nodo *asigna = crearNodoArbol(":=", crearHojaArbol("@aux"), ExpP);
+														AuxListaP = crearNodoArbol("<", ListaP, asigna);
+														struct nodo *aumenta = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
+														struct nodo *condicion = crearNodoArbol("if", AuxListaP, aumenta);
+														ListaP = crearNodoArbol("Lista", condicion, aumenta);
 														}
   | expresion					{
 	  								printf("Regla 52: LISTA_EXPRESION es expresion\n");
-								    struct nodo *compara = crearNodoArbol("==", crearHojaArbol("@aux"), ExpP);
-									struct nodo *aumenta = crearNodoArbol("+=", crearHojaArbol("@cont"), crearHojaArbol("1"));
-									ListaP = crearNodoArbol("if", compara, aumenta);
+								    ListaP = crearNodoArbol(":=", crearHojaArbol("@max"), ExpP);
+									
 								}
 ;
 
