@@ -87,6 +87,7 @@
 
 	struct Stack *stackDecision;
 	struct Stack *stackParentesis;
+	struct Stack *stackBloque;
 
 	struct Stack* createStack(unsigned capacity);
 	int isFull(struct Stack* stack);
@@ -193,7 +194,7 @@ start: programa                   {
                                     guardarTabla();
 								}
 programa:  	   	   
-  bloque_declaracion bloque       {
+  	bloque_declaracion bloque   {
                                     printf("Regla 1: PROGRAMA es bloque_declaracion bloque\n");
 									raiz = BloqueSentP;
                                   }
@@ -292,7 +293,7 @@ ciclo:
 	WHILE P_A decision P_C LL_A bloque LL_C {
 												printf("Regla 20: CICLO es while(decision){bloque}\n");
 												DecisionP = desapilar(stackDecision, DecisionP); 
-												CicloP = crearNodoArbol("while", DecisionP, BloqueIntP);
+												CicloP = crearNodoArbol("while", DecisionP, BloqueSentP);
 											}
 ;
 
@@ -308,9 +309,9 @@ if:
 	IF P_A decision P_C LL_A bloque LL_C	{
 												printf("Regla 22: IF es if(decision){bloque}\n");
 												DecisionP = desapilar(stackDecision, DecisionP);  
-												IFp = crearNodoArbol("if", DecisionP, BloqueIntP);
+												IFp = crearNodoArbol("if", DecisionP, BloqueSentP);
 											}
-	|IF P_A decision P_C LL_A bloque LL_C	{ BSd = BloqueIntP; } ELSE LL_A bloque LL_C { BSi = BloqueIntP; }
+	|IF P_A decision P_C LL_A bloque LL_C	{ BSd = BloqueSentP; } ELSE LL_A bloque LL_C { BSi = BloqueSentP; }
 											{
 												printf("Regla 23: IF es if(decision){bloque} else {bloque}\n");
 												DecisionP = desapilar(stackDecision, DecisionP);
@@ -624,6 +625,7 @@ int main(int argc,char *argv[])
   {
 	stackDecision = createStack(100);
     stackParentesis = createStack(100);
+	stackBloque = createStack(100);
 	yyparse();
 
 	crearArchivoDot(raiz);
