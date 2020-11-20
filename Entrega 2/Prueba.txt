@@ -5,6 +5,11 @@ GET actual;
 contador:= 0;
 suma:= 02.5+0xA2B0;
 
+contador:= contador + 1;
+actual:= (contador/0.342) + (contador* maximo (actual*contador, 2,
+actual*suma,maximo (4,actual,0x250) ) );
+suma:= suma + actual; 
+
 PUT "La suma es: ";
 PUT suma;
 if (actual > 0b10){
@@ -16,3 +21,6 @@ else
         PUT "no es mayor que 2";
     }
 }
+
+
+

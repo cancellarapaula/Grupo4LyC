@@ -88,6 +88,7 @@
 	struct Stack *stackDecision;
 	struct Stack *stackParentesis;
 	struct Stack *stackBloque;
+	struct Stack *stackLista;
 
 	struct Stack* createStack(unsigned capacity);
 	int isFull(struct Stack* stack);
@@ -428,21 +429,32 @@ factor:
 								}
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C {printf("Regla 50: MAXIMO es maximo(lista_expresion)\n");}
+  MAXIMO P_A lista_expresion P_C {printf("Regla 50: MAXIMO es maximo(lista_expresion)\n");
+													ListaP = desapilar(stackLista, ListaP);
+													MaximoP=ListaP;}
 ;
 
 lista_expresion:
-  lista_expresion  { AuxListaP = ListaP; } COMA expresion {
+  lista_expresion COMA expresion {
 	  													printf("Regla 51: LISTA_EXPRESION es lista_expresion,expresion\n");
+														ListaP = desapilar(stackLista, ListaP); 
 														struct nodo *asigna = crearNodoArbol(":=", crearHojaArbol("@aux"), ExpP);
-														AuxListaP = crearNodoArbol("<", ListaP, asigna);
-														struct nodo *aumenta = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
-														struct nodo *condicion = crearNodoArbol("if", AuxListaP, aumenta);
-														ListaP = crearNodoArbol("Lista", condicion, aumenta);
+														struct nodo *condicion = crearNodoArbol("<", crearHojaArbol("@max"), asigna);
+														struct nodo *accion = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
+														struct nodo *aumenta = crearNodoArbol("if", condicion, accion);
+														ListaP = crearNodoArbol("Lista", ListaP, aumenta);
+														push(stackLista, ListaP);
 														}
   | expresion					{
 	  								printf("Regla 52: LISTA_EXPRESION es expresion\n");
-								    ListaP = crearNodoArbol(":=", crearHojaArbol("@max"), ExpP);
+									struct nodo * max = crearNodoArbol(":=", crearHojaArbol("@max"), ExpP);
+									struct nodo * aux = crearNodoArbol(":=", crearHojaArbol("@aux"), crearHojaArbol("-32767"));
+								    struct nodo *condicion = crearNodoArbol("<", max, aux);
+									struct nodo *accion = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
+									ListaP = crearNodoArbol("if", condicion, accion);
+									push(stackLista, ListaP);
+									
+									
 									
 								}
 ;
@@ -626,6 +638,7 @@ int main(int argc,char *argv[])
 	stackDecision = createStack(100);
     stackParentesis = createStack(100);
 	stackBloque = createStack(100);
+	stackLista = createStack(100);
 	yyparse();
 
 	crearArchivoDot(raiz);
