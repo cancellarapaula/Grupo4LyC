@@ -1,3 +1,4 @@
+
 DIM < contador,promedio,actual,suma> AS < Integer,Float,Float,Float >
 PUT "Prueba.txt LyC Tema 2!";
 PUT "Ing entero para actual: ";
@@ -5,10 +6,15 @@ GET actual;
 contador:= 0;
 suma:= 02.5+0xA2B0;
 
-contador:= contador + 1;
-actual:= (contador/0.342) + (contador* maximo (actual*contador, 2,
-actual*suma,maximo (4,actual,0x250) ) );
-suma:= suma + actual; 
+
+while (contador <= 9) {
+    contador:= contador + 1;
+	actual:= (contador/0.342) + (contador* maximo (actual*contador, 2,
+    actual*suma,maximo (4,actual,2) ) );
+    suma:= suma + actual;
+}
+
+
 
 PUT "La suma es: ";
 PUT suma;
@@ -21,6 +27,5 @@ else
         PUT "no es mayor que 2";
     }
 }
-
 
 

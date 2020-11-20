@@ -71,6 +71,8 @@
 	struct nodo *ListaP = NULL;
 	struct nodo *AuxListaP = NULL;
 	struct nodo *MaximoP = NULL;
+	struct nodo *AuxBloqueInternoP = NULL;
+	struct nodo *BloqueInternoP = NULL;
 
 	struct nodo *crearHojaArbol(char *);
 	struct nodo *crearNodoArbol(char *, struct nodo *, struct nodo *);
@@ -267,54 +269,64 @@ bloque:
 									BloqueSentP = SentP;
 								}
 ;
-
+bloque_interno:
+  sentencia
+  {
+    printf("Regla 15: sentencia interna simple\n");
+    BloqueInternoP = SentP;
+  }
+  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia
+  {
+    printf("Regla 16: bloque interno\n");
+    BloqueInternoP = crearNodoArbol("BI", AuxBloqueInternoP, SentP);
+  };
 sentencia:
   ciclo                         {
-	  								printf("Regla 15: SENTENCIA es ciclo\n");
+	  								printf("Regla 17: SENTENCIA es ciclo\n");
   									SentP = CicloP;}
   |if                           {
-	  								printf("Regla 16: SENTENCIA es if\n");
+	  								printf("Regla 18: SENTENCIA es if\n");
 									SentP = IFp;
 								}
   |asignacion                   {
-	  								printf("Regla 17: SENTENCIA es asignacion\n");
+	  								printf("Regla 19: SENTENCIA es asignacion\n");
 									SentP = AsigP;
 								}                
   |salida                       {
-									printf("Regla 18: SENTENCIA es salida\n");
+									printf("Regla 20: SENTENCIA es salida\n");
 									SentP = SalidaP;
 								}
   |entrada                      {
-	  								printf("Regla 19: SENTENCIA es entrada\n");
+	  								printf("Regla 21: SENTENCIA es entrada\n");
 									SentP = EntradaP;
 								}             
 ;
 
 ciclo:
-	WHILE P_A decision P_C LL_A bloque LL_C {
-												printf("Regla 20: CICLO es while(decision){bloque}\n");
+	WHILE P_A decision P_C LL_A bloque_interno LL_C {
+												printf("Regla 22: CICLO es while(decision){bloque	}\n");
 												DecisionP = desapilar(stackDecision, DecisionP); 
-												CicloP = crearNodoArbol("while", DecisionP, BloqueSentP);
+												CicloP = crearNodoArbol("while", DecisionP, BloqueInternoP);
 											}
 ;
 
 asignacion: 
 	ID OP_ASIG expresion P_Y_C {
                                 chequearVarEnTabla($1);
-                                printf("Regla 21: ASIGNACION es id:=expresion; ExpP-> valor:%s<- \n", ExpP->valor);
+                                printf("Regla 23: ASIGNACION es id:=expresion; ExpP-> valor:%s<- \n", ExpP->valor);
 								AsigP = crearNodoArbol(":=", crearHojaArbol($1), ExpP);
                               }
 ;
 
 if: 
 	IF P_A decision P_C LL_A bloque LL_C	{
-												printf("Regla 22: IF es if(decision){bloque}\n");
+												printf("Regla 24: IF es if(decision){bloque}\n");
 												DecisionP = desapilar(stackDecision, DecisionP);  
 												IFp = crearNodoArbol("if", DecisionP, BloqueSentP);
 											}
 	|IF P_A decision P_C LL_A bloque LL_C	{ BSd = BloqueSentP; } ELSE LL_A bloque LL_C { BSi = BloqueSentP; }
 											{
-												printf("Regla 23: IF es if(decision){bloque} else {bloque}\n");
+												printf("Regla 25: IF es if(decision){bloque} else {bloque}\n");
 												DecisionP = desapilar(stackDecision, DecisionP);
 												struct nodo *cuerpo = crearNodoArbol("cuerpo", BSd, BSi);
 												IFp = crearNodoArbol("if", DecisionP, cuerpo);
@@ -323,120 +335,120 @@ if:
 
 decision:
   decision {AuxDecisionP = DecisionP;} logico condicion {
-	  															printf("Regla 24: DECISION ES decision op_logico condicion\n");
-																DecisionP = crearNodoArbol(_decision, AuxCondP, CondP);
+	  															printf("Regla 26: DECISION ES decision op_logico condicion\n");
+																DecisionP = crearNodoArbol(_decision, AuxDecisionP, CondP);
 																push(stackDecision, DecisionP);
 															}
   |condicion                   {
-	  								printf("Regla 25: DECISION es condicion\n"); 
+	  								printf("Regla 27: DECISION es condicion\n"); 
 									DecisionP = CondP;
 									push(stackDecision, DecisionP);
 								}
 ;
 
 logico:
-  OP_AND						{printf("Regla 26: LOGICO es and\n");{_decision = "AND";}}
-  |OP_OR						{printf("Regla 27: LOGICO es or\n");{_decision = "OR";}}
+  OP_AND						{printf("Regla 28: LOGICO es and\n");{_decision = "AND";}}
+  |OP_OR						{printf("Regla 29: LOGICO es or\n");{_decision = "OR";}}
 ;
 condicion:
   OP_NEGACION condicion			{
-	  								printf("Regla 28: CONDICION es not condicion\n"); 
+	  								printf("Regla 30: CONDICION es not condicion\n"); 
 									CondP = crearNodoArbol("NOT", CondP, CondP);
 								}
   |expresion {AuxExpP = ExpP;} comparador expresion {
-	  													printf("Regla 29: CONDICION es expresion comparador expresion\n");
+	  													printf("Regla 31: CONDICION es expresion comparador expresion\n");
 														CondP = crearNodoArbol(_comparacion, AuxExpP, ExpP);
 													}
 ;
 
 comparador:
-  OP_IGUAL                    {printf("Regla 30: COMPARADOR ES =\n");{_comparacion = "==";}}
-  |OP_DISTINTO                {printf("Regla 31: COMPARADOR ES <>\n"); {_comparacion = "<>";}}
-  |OP_MENORIGUAL              {printf("Regla 32: COMPARADOR ES <=\n"); {_comparacion = "<=";}}
-  |OP_MAYORIGUAL              {printf("Regla 33: COMPARADOR ES >=\n"); {_comparacion = ">=";}}
-  |OP_MAYOR                   {printf("Regla 34: COMPARADOR ES >\n");{_comparacion = ">";}}
-  |OP_MENOR                   {printf("Regla 35: COMPARADOR ES <\n"); {_comparacion = "<";}	}
+  OP_IGUAL                    {printf("Regla 32: COMPARADOR ES =\n");{_comparacion = "==";}}
+  |OP_DISTINTO                {printf("Regla 33: COMPARADOR ES <>\n"); {_comparacion = "<>";}}
+  |OP_MENORIGUAL              {printf("Regla 34: COMPARADOR ES <=\n"); {_comparacion = "<=";}}
+  |OP_MAYORIGUAL              {printf("Regla 35: COMPARADOR ES >=\n"); {_comparacion = ">=";}}
+  |OP_MAYOR                   {printf("Regla 36: COMPARADOR ES >\n");{_comparacion = ">";}}
+  |OP_MENOR                   {printf("Regla 37: COMPARADOR ES <\n"); {_comparacion = "<";}	}
 ;
 
 expresion:
   expresion { push(stackParentesis, ExpP); } OP_SUMA termino   {
-	  																printf("Regla 36: EXPRESION es expresion+termino\n");
+	  																printf("Regla 38: EXPRESION es expresion+termino\n");
 																	ExpP = desapilar(stackParentesis, ExpP);
 																	ExpP = crearNodoArbol("+", ExpP, TermP);
 																}
 	|expresion{push(stackParentesis, ExpP); }  OP_REST termino  {
-																	printf("Regla 37: EXPRESION es expresion-termino\n");
+																	printf("Regla 39: EXPRESION es expresion-termino\n");
 																	ExpP = desapilar(stackParentesis, ExpP);
 																	ExpP = crearNodoArbol("-", ExpP, TermP);
 																}
   |termino                   {
-	  							printf("Regla 38: EXPRESION es termino\n"); 
+	  							printf("Regla 40: EXPRESION es termino\n"); 
   								ExpP = TermP;
 							}
 ;
 
 termino: 
   termino { push(stackParentesis, TermP); } OP_MULT factor      {
-	  																printf("Regla 39: TERMINO es termino*factor\n");
+	  																printf("Regla 41: TERMINO es termino*factor\n");
 																	TermP = desapilar(stackParentesis, TermP);
 																	TermP = crearNodoArbol("*", TermP, FactP);
 																}
 	|termino{push(stackParentesis, TermP) ;} OP_DIVI factor     {
-																	printf("Regla 40: TERMINO es termino/factor\n");
+																	printf("Regla 42: TERMINO es termino/factor\n");
 																	TermP = desapilar(stackParentesis, TermP);
 																	TermP = crearNodoArbol("/", TermP, FactP);
 																}
     |factor                     {
-									printf("Regla 41: TERMINO es factor\n"); 
+									printf("Regla 43: TERMINO es factor\n"); 
 									TermP = FactP;
 								}
 ;
 
 factor:
-  P_A expresion P_C				{printf("Regla 42: FACTOR es (expresion)\n");FactP = ExpP;  }  
-	|maximo						{printf("Regla 43: FACTOR es maximo\n"); FactP =MaximoP;} 
+  P_A expresion P_C				{printf("Regla 44: FACTOR es (expresion)\n");FactP = ExpP;  }  
+	|maximo						{printf("Regla 45: FACTOR es maximo\n"); FactP =MaximoP;} 
 	|ID                         {
-                                	printf("Regla 44: FACTOR es id\n");
+                                	printf("Regla 46: FACTOR es id\n");
                                 	chequearVarEnTabla(yylval.valor_string);  
                             		FactP = crearHojaArbol(yylval.valor_string);
 								}
 	|CTE_STRING                 {
-									printf("Regla 45: FACTOR es cte_string\n");
+									printf("Regla 47: FACTOR es cte_string\n");
 									agregarCteStringATabla(yylval.valor_string);
                             		FactP = crearHojaArbol(yylval.valor_string);
 								}
 	|CTE_INT                    {
-									printf("Regla 46: FACTOR es cte_int\n");
+									printf("Regla 48: FACTOR es cte_int\n");
 									agregarCteIntATabla(atoi(yylval.valor_string));  
 									FactP = crearHojaArbol(yylval.valor_string);
 									printf("-crea el nodo FactP: %s\n", FactP->valor);
 								}
 	|CTE_REAL                   {
-									printf("Regla 47: FACTOR es cte_real\n");
+									printf("Regla 49: FACTOR es cte_real\n");
 									agregarCteRealATabla(atof(yylval.valor_string));
 									FactP = crearHojaArbol(yylval.valor_string);
 									printf("-crea el nodo FactP: %s\n", FactP->valor);
 								}
 	|CTE_BIN                    {
-									printf("Regla 48: FACTOR es cte_bin\n");
+									printf("Regla 50: FACTOR es cte_bin\n");
 									agregarCteBinariaATabla(yylval.valor_string);
 									FactP = crearHojaArbol(yylval.valor_string);
 								}
 	|CTE_HEXA                   {
-                                	printf("Regla 49: FACTOR es cte_hexa\n");
+                                	printf("Regla 51: FACTOR es cte_hexa\n");
                                 	agregarCteHexaATabla(yylval.valor_string);
 									FactP = crearHojaArbol(yylval.valor_string);
 								}
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C {printf("Regla 50: MAXIMO es maximo(lista_expresion)\n");
+  MAXIMO P_A lista_expresion P_C {printf("Regla 52: MAXIMO es maximo(lista_expresion)\n");
 													ListaP = desapilar(stackLista, ListaP);
 													MaximoP=ListaP;}
 ;
 
 lista_expresion:
   lista_expresion COMA expresion {
-	  													printf("Regla 51: LISTA_EXPRESION es lista_expresion,expresion\n");
+	  													printf("Regla 53: LISTA_EXPRESION es lista_expresion,expresion\n");
 														ListaP = desapilar(stackLista, ListaP); 
 														struct nodo *asigna = crearNodoArbol(":=", crearHojaArbol("@aux"), ExpP);
 														struct nodo *condicion = crearNodoArbol("<", crearHojaArbol("@max"), asigna);
@@ -446,7 +458,7 @@ lista_expresion:
 														push(stackLista, ListaP);
 														}
   | expresion					{
-	  								printf("Regla 52: LISTA_EXPRESION es expresion\n");
+	  								printf("Regla 54: LISTA_EXPRESION es expresion\n");
 									struct nodo * max = crearNodoArbol(":=", crearHojaArbol("@max"), ExpP);
 									struct nodo * aux = crearNodoArbol(":=", crearHojaArbol("@aux"), crearHojaArbol("-32767"));
 								    struct nodo *condicion = crearNodoArbol("<", max, aux);
@@ -461,13 +473,13 @@ lista_expresion:
 
 salida:
 	PUT CTE_STRING P_Y_C		{
-									printf("Regla 53: SALIDA es PUT cte_string;\n");
+									printf("Regla 55: SALIDA es PUT cte_string;\n");
 									agregarCteStringATabla(yylval.valor_string);  
 									SalidaP = crearNodoArbol("IO", crearHojaArbol("out"), crearHojaArbol(yylval.valor_string));
                             	}
 	|PUT ID P_Y_C               {
 									chequearVarEnTabla($2);
-									printf("Regla 54: SALIDA es PUT id;\n");
+									printf("Regla 56: SALIDA es PUT id;\n");
 									SalidaP = crearNodoArbol("IO", crearHojaArbol("out"), crearHojaArbol(yylval.valor_string));   
                             	}
 ;
@@ -475,7 +487,7 @@ salida:
 entrada:
   GET ID P_Y_C                {
                             	chequearVarEnTabla($2);
-                                printf("Regla 55: ENTRADA es GET id;\n");
+                                printf("Regla 57: ENTRADA es GET id;\n");
 								EntradaP = crearNodoArbol("IO", crearHojaArbol("in"), crearHojaArbol(yylval.valor_string));
                               }
 ;
