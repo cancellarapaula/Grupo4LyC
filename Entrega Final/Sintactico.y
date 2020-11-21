@@ -90,6 +90,7 @@
 	struct Stack *stackDecision;
 	struct Stack *stackParentesis;
 	struct Stack *stackBloque;
+	struct Stack *stackBloqueInterno;
 	struct Stack *stackLista;
 
 	struct Stack* createStack(unsigned capacity);
@@ -97,7 +98,7 @@
 	int isEmpty(struct Stack* stack);
 	void push(struct Stack* stack, struct nodo *item);
 	struct nodo* pop(struct Stack* stack);
-	struct nodo *desapilar(struct Stack* stack, struct nodo* fp);
+	struct nodo *desapilar(struct Stack* stack);
 
 	//------------------------------------------------
 	/*graph */
@@ -259,27 +260,34 @@ tipo_dato:
 ;
 
 bloque: 
-  bloque { AuxBloqueSentP = BloqueSentP; } sentencia
+  bloque sentencia
 								{
 									printf("Regla 13: BLOQUE es bloque sentencia\n");
+									AuxBloqueSentP = desapilar(stackBloque);
 									BloqueSentP = crearNodoArbol("BS", AuxBloqueSentP, SentP);
+									push(stackBloque, BloqueSentP);
 								}
   |sentencia                    {
 	  								printf("Regla 14: BLOQUE es sentencia\n"); 
 									BloqueSentP = SentP;
+									push(stackBloque, BloqueSentP);
 								}
 ;
 bloque_interno:
-  sentencia
-  {
-    printf("Regla 15: sentencia interna simple\n");
-    BloqueInternoP = SentP;
-  }
-  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia
-  {
-    printf("Regla 16: bloque interno\n");
-    BloqueInternoP = crearNodoArbol("BI", AuxBloqueInternoP, SentP);
-  };
+  bloque_interno sentencia
+								{
+									printf("Regla 15: BLOQUE_INTERNO es bloque_interno sentencia\n");
+									AuxBloqueInternoP = desapilar(stackBloqueInterno);
+									BloqueInternoP = crearNodoArbol("BI", AuxBloqueInternoP, SentP);
+									push(stackBloqueInterno, BloqueInternoP);
+								}
+  |sentencia
+								{
+									printf("Regla 16: BLOQUE_INTERNO es sentencia\n");
+									BloqueInternoP = SentP;
+									push(stackBloqueInterno, BloqueInternoP);
+								}
+;
 sentencia:
   ciclo                         {
 	  								printf("Regla 17: SENTENCIA es ciclo\n");
@@ -304,8 +312,9 @@ sentencia:
 
 ciclo:
 	WHILE P_A decision P_C LL_A bloque_interno LL_C {
-												printf("Regla 22: CICLO es while(decision){bloque	}\n");
-												DecisionP = desapilar(stackDecision, DecisionP); 
+												printf("Regla 22: CICLO es while(decision){bloque}\n");
+												DecisionP = desapilar(stackDecision); 
+												BloqueInternoP = desapilar(stackBloqueInterno);
 												CicloP = crearNodoArbol("while", DecisionP, BloqueInternoP);
 											}
 ;
@@ -313,7 +322,7 @@ ciclo:
 asignacion: 
 	ID OP_ASIG expresion P_Y_C {
                                 chequearVarEnTabla($1);
-                                printf("Regla 23: ASIGNACION es id:=expresion; ExpP-> valor:%s<- \n", ExpP->valor);
+                                printf("Regla 23: ASIGNACION es id:=expresion; \n");
 								AsigP = crearNodoArbol(":=", crearHojaArbol($1), ExpP);
                               }
 ;
@@ -321,13 +330,14 @@ asignacion:
 if: 
 	IF P_A decision P_C LL_A bloque LL_C	{
 												printf("Regla 24: IF es if(decision){bloque}\n");
-												DecisionP = desapilar(stackDecision, DecisionP);  
+												DecisionP = desapilar(stackDecision);  
+												BloqueSentP = desapilar(stackBloque);
 												IFp = crearNodoArbol("if", DecisionP, BloqueSentP);
 											}
-	|IF P_A decision P_C LL_A bloque LL_C	{ BSd = BloqueSentP; } ELSE LL_A bloque LL_C { BSi = BloqueSentP; }
+	|IF P_A decision P_C LL_A bloque LL_C	{ BSd = desapilar(stackBloque); } ELSE LL_A bloque LL_C { BSi = desapilar(stackBloque); }
 											{
 												printf("Regla 25: IF es if(decision){bloque} else {bloque}\n");
-												DecisionP = desapilar(stackDecision, DecisionP);
+												DecisionP = desapilar(stackDecision);
 												struct nodo *cuerpo = crearNodoArbol("cuerpo", BSd, BSi);
 												IFp = crearNodoArbol("if", DecisionP, cuerpo);
 											}
@@ -373,12 +383,12 @@ comparador:
 expresion:
   expresion { push(stackParentesis, ExpP); } OP_SUMA termino   {
 	  																printf("Regla 38: EXPRESION es expresion+termino\n");
-																	ExpP = desapilar(stackParentesis, ExpP);
+																	ExpP = desapilar(stackParentesis);
 																	ExpP = crearNodoArbol("+", ExpP, TermP);
 																}
 	|expresion{push(stackParentesis, ExpP); }  OP_REST termino  {
 																	printf("Regla 39: EXPRESION es expresion-termino\n");
-																	ExpP = desapilar(stackParentesis, ExpP);
+																	ExpP = desapilar(stackParentesis);
 																	ExpP = crearNodoArbol("-", ExpP, TermP);
 																}
   |termino                   {
@@ -390,12 +400,12 @@ expresion:
 termino: 
   termino { push(stackParentesis, TermP); } OP_MULT factor      {
 	  																printf("Regla 41: TERMINO es termino*factor\n");
-																	TermP = desapilar(stackParentesis, TermP);
+																	TermP = desapilar(stackParentesis);
 																	TermP = crearNodoArbol("*", TermP, FactP);
 																}
 	|termino{push(stackParentesis, TermP) ;} OP_DIVI factor     {
 																	printf("Regla 42: TERMINO es termino/factor\n");
-																	TermP = desapilar(stackParentesis, TermP);
+																	TermP = desapilar(stackParentesis);
 																	TermP = crearNodoArbol("/", TermP, FactP);
 																}
     |factor                     {
@@ -421,13 +431,11 @@ factor:
 									printf("Regla 48: FACTOR es cte_int\n");
 									agregarCteIntATabla(atoi(yylval.valor_string));  
 									FactP = crearHojaArbol(yylval.valor_string);
-									printf("-crea el nodo FactP: %s\n", FactP->valor);
 								}
 	|CTE_REAL                   {
 									printf("Regla 49: FACTOR es cte_real\n");
 									agregarCteRealATabla(atof(yylval.valor_string));
 									FactP = crearHojaArbol(yylval.valor_string);
-									printf("-crea el nodo FactP: %s\n", FactP->valor);
 								}
 	|CTE_BIN                    {
 									printf("Regla 50: FACTOR es cte_bin\n");
@@ -442,14 +450,14 @@ factor:
 ;
 maximo:
   MAXIMO P_A lista_expresion P_C {printf("Regla 52: MAXIMO es maximo(lista_expresion)\n");
-													ListaP = desapilar(stackLista, ListaP);
+													ListaP = desapilar(stackLista);
 													MaximoP=ListaP;}
 ;
 
 lista_expresion:
   lista_expresion COMA expresion {
 	  													printf("Regla 53: LISTA_EXPRESION es lista_expresion,expresion\n");
-														ListaP = desapilar(stackLista, ListaP); 
+														ListaP = desapilar(stackLista); 
 														struct nodo *asigna = crearNodoArbol(":=", crearHojaArbol("@aux"), ExpP);
 														struct nodo *condicion = crearNodoArbol("<", crearHojaArbol("@max"), asigna);
 														struct nodo *accion = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
@@ -465,8 +473,6 @@ lista_expresion:
 									struct nodo *accion = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
 									ListaP = crearNodoArbol("if", condicion, accion);
 									push(stackLista, ListaP);
-									
-									
 									
 								}
 ;
@@ -495,10 +501,12 @@ entrada:
 %%
 // ----------------------------------------------------------------------------------
 
-struct nodo *desapilar(struct Stack* stack, struct nodo* fp){
+struct nodo *desapilar(struct Stack* stack){
   struct nodo *n = pop(stack);
   if(n) return n;
-  return fp;
+  printf("ERROR en GCI: El stack se encuentra vacio.\n");
+  system("Pause");
+  exit(2);
 }
 
 struct nodo *crearHojaArbol(char *nombre){
@@ -637,10 +645,6 @@ char* strReplace(char* search, char* replace, char* subject) {
 
 int main(int argc,char *argv[])
 {
-  //#ifdef YYDEBUG
-    //yydebug = 1;
-  //#endif 
-
   if ((yyin = fopen(argv[1], "rt")) == NULL)
   {
 	  printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
@@ -650,6 +654,7 @@ int main(int argc,char *argv[])
 	stackDecision = createStack(100);
     stackParentesis = createStack(100);
 	stackBloque = createStack(100);
+	stackBloqueInterno = createStack(100);
 	stackLista = createStack(100);
 	yyparse();
 
@@ -661,7 +666,7 @@ int main(int argc,char *argv[])
 
 int yyerror(char* mensaje)
  {
-	printf("Syntax Error: %s\n", mensaje);
+	printf("ERROR SINTACTICO: %s\n", mensaje);
 	system ("Pause");
 	exit (1);
  }
@@ -739,9 +744,7 @@ void escribirNombreEnTabla(char* nombre, int pos){
  void agregarVarATabla(char* nombre){
 	 //Si se llena la tabla, sale por error
 	 if(fin_tabla >= TAMANIO_TABLA - 1){
-		 printf("Error: No hay mas espacio en la tabla de simbolos.\n");
-		 system("Pause");
-		 exit(2);
+		 yyerror("No hay mas espacio en la tabla de simbolos");
 	 }
 	 //Si no existe en la tabla, lo agrega
 	 if(buscarEnTabla(nombre) == -1){
@@ -815,9 +818,7 @@ void guardarTabla(){
 /** Agrega una constante string a la tabla de simbolos */
 void agregarCteStringATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
-		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
-		system("Pause");
-		exit(2);
+		yyerror("No hay mas espacio en la tabla de simbolos");
 	}
 
 	char nombre[31] = "_";
@@ -853,9 +854,7 @@ void agregarCteStringATabla(char* str){
 /** Agrega una constante real a la tabla de simbolos */
 void agregarCteRealATabla(float valor){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
-		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
-		system("Pause");
-		exit(2);
+		yyerror("No hay mas espacio en la tabla de simbolos");
 	}
 
 	//Genero el nombre
@@ -879,9 +878,7 @@ void agregarCteRealATabla(float valor){
 /** Agrega una constante entera a la tabla de simbolos */
 void agregarCteIntATabla(int valor){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
-		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
-		system("Pause");
-		exit(2);
+		yyerror("No hay mas espacio en la tabla de simbolos");
 	}
 
 	//Genero el nombre
@@ -905,9 +902,7 @@ void agregarCteIntATabla(int valor){
 /** Agrega una constante binaria a la tabla de simbolos */
 void agregarCteBinariaATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
-		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
-		system("Pause");
-		exit(2);
+		yyerror("No hay mas espacio en la tabla de simbolos");
 	}
 
 	char nombre[31] = "_";
@@ -938,9 +933,7 @@ void agregarCteBinariaATabla(char* str){
 /** Agrega una constante hexa a la tabla de simbolos */
 void agregarCteHexaATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
-		printf("Error: No hay mas espacio en la tabla de simbolos.\n");
-		system("Pause");
-		exit(2);
+		yyerror("No hay mas espacio en la tabla de simbolos");
 	}
 
 	char nombre[31] = "_";
