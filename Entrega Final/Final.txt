@@ -1,0 +1,47 @@
+.MODEL LARGE
+.386
+.STACK 200h
+
+
+
+.DATA
+
+contador dd ?                         
+promedio dd ?                          
+actual dd ?                        
+suma dd ?                    
+_Prueba.txt LyC Tema 2! db "Prueba.txt LyC Tema 2!", '$'                          
+_Ing entero para actual: db "Ing entero para actual", '$'                          
+_0 dd 0.0                          
+_2.500000 dd 2.500000                       
+_0xA2B0 dd 41648.0                       
+_9 dd 9.0                         
+_1 dd 1.0                          
+_0.342000 dd 0.342000.0                           
+_2 dd 2.0                           
+_4 dd 4.0                          
+_La suma es: db "La suma es:", '$'                            
+_0b10 dd 2.0                  
+_act es > 2 y != de cero db "act es > 2 y != de cero", '$'                        
+_0b111010 dd 58.0                            
+_no es mayor que 2 db "no es mayor que 2", '$'                            
+
+
+.CODE
+
+START:
+
+MOV AX,@DATA
+MOV DS, AX
+FINIT
+
+//////////////////////insert codigo
+
+
+
+MOV AH, 1
+INT 21h
+MOV AX, 4C00h
+INT 21h
+
+END START
