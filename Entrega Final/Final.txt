@@ -11,7 +11,7 @@ promedio dd ?
 actual dd ?                        
 suma dd ?                    
 _Prueba.txt LyC Tema 2! db "Prueba.txt LyC Tema 2!", '$'                          
-_Ing entero para actual: db "Ing entero para actual", '$'                          
+T_Read db "Ing entero para actual", '$', 16 dup (?)                          
 _0 dd 0.0                          
 _2.500000 dd 2.500000                       
 _0xA2B0 dd 41648.0                       
@@ -35,6 +35,51 @@ MOV AX,@DATA
 MOV DS, AX
 FINIT
 
+DisplayString _Prueba.txt LyC Tema 2!,1
+newLine
+
+mov dx, OFFSET T_Read
+	mov ah,9
+	int 21h
+	
+	GetInteger actual
+	
+	FILD actual ;
+	
+	FILD _0       ;st0=0
+	FSTP contador  
+	
+	FLD _02.500000 ;st0=2.5
+	FILD _0xA2B0 ;st1=41648.0
+	FADD  ; st1 y st0 = 41650.5
+	FSTP suma
+	
+	Etiq_1:
+	FLD contador
+	FILD _9 ;st0=9 y st1=contador
+	FCOM ;0-1
+	FSTSW AX
+	SAHF
+	FFREE
+	JA Etiq_11:
+	FLD contador
+	FLD _1
+	FADD
+	FSTP contador
+	
+	FILD contador
+	FLD _0.342000
+	FXCH
+	FDIV 
+	
+	
+
+
+
+
+	JMP Etiq_1
+		
+	
 //////////////////////insert codigo
 
 
