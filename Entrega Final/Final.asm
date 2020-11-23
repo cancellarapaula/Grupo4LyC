@@ -1,8 +1,13 @@
+include macros2.asm
+include number.asm
+
 .MODEL LARGE
 .386
+.387
 .STACK 200h
 
 
+MAXTEXTSIZE EQU 32
 
 .DATA
 
@@ -10,21 +15,27 @@ contador dd ?
 promedio dd ?                          
 actual dd ?                        
 suma dd ?                    
-_Prueba.txt LyC Tema 2! db "Prueba.txt LyC Tema 2!", '$'                          
-T_Read db "Ing entero para actual", '$', 16 dup (?)                          
+@msg_prueba db "Prueba.txt LyC Tema 2!", '$'                          
+@msg_ingreso db "Ing entero para actual:", '$'                         
 _0 dd 0.0                          
-_2.500000 dd 2.500000                       
+_2_5 dd 2.500000                       
 _0xA2B0 dd 41648.0                       
 _9 dd 9.0                         
 _1 dd 1.0                          
-_0.342000 dd 0.342000.0                           
+_0_342 dd 0.342000                           
 _2 dd 2.0                           
 _4 dd 4.0                          
-_La suma es: db "La suma es:", '$'                            
+@msg_suma db "La suma es:", '$'                            
 _0b10 dd 2.0                  
-_act es > 2 y != de cero db "act es > 2 y != de cero", '$'                        
+@msg_verdadero db "act es > 2 y != de cero", '$'                        
 _0b111010 dd 58.0                            
-_no es mayor que 2 db "no es mayor que 2", '$'                            
+@msg_falso db "no es mayor que 2", '$'       
+@max dd ?
+@aux dd ?
+@aux2 dd ?
+@max2 dd ?
+_cte32767 dd -32767.0
+                     
 
 
 .CODE
@@ -35,21 +46,21 @@ MOV AX,@DATA
 MOV DS, AX
 FINIT
 
-DisplayString _Prueba.txt LyC Tema 2!,1
+DisplayString @msg_prueba,1
 newLine
 
-mov dx, OFFSET T_Read
-    mov ah,9
-    int 21h
+
+    DisplayString @msg_ingreso
+	int 21h 
+	newLine 1
+	GetInteger actual
     
-    GetInteger actual
-    
-    FILD actual ;
+    FLD actual ;
     
     FILD _0       ;st0=0
     FSTP contador  
     
-    FLD _02.500000 ;st0=2.5
+    FLD _2_5 ;st0=2.5
     FILD _0xA2B0 ;st1=41648.0
     FADD  ; st1 y st0 = 41650.5
     FSTP suma
@@ -62,14 +73,14 @@ Etiq_1:
     FSTSW AX
     SAHF
     FFREE
-    JA Etiq_18:
+    JA Etiq_18
     FLD contador
     FLD _1
     FADD
     FSTP contador
     
     FILD contador
-    FLD _0.342000
+    FLD _0_342
     FXCH
     FDIV 
     FSTP @aux2 ;lo guardo para poder sumarlo con el (contador * @max)
@@ -200,7 +211,7 @@ Etiq_17:
     JMP Etiq_1 ;fin del while salto a Etiq_1 y vuelvo a preguntar 
     
 Etiq_18:
-    DisplayString _La suma es:,1
+    DisplayString @msg_suma,1
     newLine
     DisplayFloat suma,2
     
@@ -214,7 +225,7 @@ Etiq_18:
     JNA Etiq_20 ; si actual no es mayor a 2
 
 Etiq_19:
-    DisplayString _act es > 2 y != de cero
+    DisplayString @msg_verdadero
     newLine
     
 Etiq_20: ;parte falsa
@@ -228,7 +239,7 @@ Etiq_20: ;parte falsa
     JAE Etiq_22 ;si actual no es menor que 58
     
 Etiq_21: ;parte verdadera
-    DisplayString _no es mayor que 2
+    DisplayString @msg_falso
     newLine
     
 Etiq_22:
