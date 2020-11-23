@@ -12,8 +12,12 @@ _0xA2B0                       |CTE_HEXA                      |41648             
 _9                            |CTE_INT                       |9                             |--                            
 _1                            |CTE_INT                       |1                             |--                            
 _0.342000                     |CTE_REAL                      |0.342000                      |--                            
+@max0                         |FLOAT                         |--                            |--                            
+@aux0                         |FLOAT                         |--                            |--                            
 _2                            |CTE_INT                       |2                             |--                            
 _4                            |CTE_INT                       |4                             |--                            
+@max1                         |FLOAT                         |--                            |--                            
+@aux1                         |FLOAT                         |--                            |--                            
 _La suma es:                  |CTE_STRING                    |La suma es:                   |12                            
 _0b10                         |CTE_BINARIA                   |2                             |--                            
 _act es > 2 y != de cero      |CTE_STRING                    |act es > 2 y != de cero       |23                            

@@ -38,6 +38,10 @@
 	#define TAMANIO_TABLA 3000
 	#define TAM_NOMBRE 32
 
+	#define esBlanco(x) ((x) == ' ' || (x) == '\t' ? 1:0)
+	#define aMayusc(x) ((x) > 'a' && (x) < 'z' ? (x)-32 : (x))
+	#define aMinusc(x) ((x) > 'A' && (x) < 'Z' ? (x)+32 : (x))
+
 	int yylex();
 	
 	// estructura de nodos para arbol sintactico -----
@@ -109,6 +113,7 @@
 	/* Funciones necesarias */
 	int yyerror(char* mensaje);
 	void agregarVarATabla(char* nombre);
+	void agregarVarFloatATabla(char* nombre);
 	void agregarTiposDatosATabla(void);
 	void agregarCteStringATabla(char* str);
 	void agregarCteIntATabla(int valor);
@@ -119,10 +124,14 @@
 	int buscarEnTabla(char * name);
 	void escribirNombreEnTabla(char* nombre, int pos);
 	void guardarTabla(void);
+	void recorrerArbol(struct nodo *raiz);
+	char *quitarblancos(char *cad);
+	void generarAssembler(void);
 
 	int yystopparser=0;
 	FILE  *yyin;
 	FILE* archIntermedia = NULL;
+	FILE *tasm = NULL;
 
 	/* Estructura de tabla de simbolos */
 	typedef struct {
@@ -143,6 +152,10 @@
 	int cantTipoDatoDeclarado = 0;
 	int tipoDatoADeclarar;
 	int contador = 0;
+	int contMaximoAnidado = 0;
+	char contMaximoAnidadoString[2];
+	char nombreAux[30];
+	char nombreMax[30];
 
 %}
 
@@ -197,6 +210,7 @@ start: programa                   {
 									printf("Regla 0: START es programa\n");
 									printf("\n\nCOMPILACION EXITOSA\n\n");
                                     guardarTabla();
+									generarAssembler();
 								}
 programa:  	   	   
   	bloque_declaracion bloque   {
@@ -450,31 +464,44 @@ factor:
 								}
 ;
 maximo:
-  MAXIMO P_A lista_expresion P_C {printf("Regla 52: MAXIMO es maximo(lista_expresion)\n");
-													ListaP = desapilar(stackLista);
-													MaximoP=ListaP;}
+  MAXIMO P_A lista_expresion P_C {
+	  								printf("Regla 52: MAXIMO es maximo(lista_expresion)\n");
+									ListaP = desapilar(stackLista);
+									MaximoP=ListaP;
+									contMaximoAnidado--;
+									}
 ;
 
 lista_expresion:
   lista_expresion COMA expresion {
-	  													printf("Regla 53: LISTA_EXPRESION es lista_expresion,expresion\n");
-														ListaP = desapilar(stackLista); 
-														struct nodo *asigna = crearNodoArbol(":=", crearHojaArbol("@aux"), ExpP);
-														struct nodo *condicion = crearNodoArbol("<", crearHojaArbol("@max"), asigna);
-														struct nodo *accion = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
-														struct nodo *aumenta = crearNodoArbol("if", condicion, accion);
-														ListaP = crearNodoArbol("Lista", ListaP, aumenta);
-														push(stackLista, ListaP);
-														}
+									printf("Regla 53: LISTA_EXPRESION es lista_expresion,expresion %d-- %s\n", contMaximoAnidado,nombreAux );
+									ListaP = desapilar(stackLista); 
+									
+									struct nodo *asigna = crearNodoArbol(":=", crearHojaArbol(nombreAux), ExpP);
+									struct nodo *condicion = crearNodoArbol("<", crearHojaArbol(nombreMax), asigna);
+									struct nodo *accion = crearNodoArbol(":=", crearHojaArbol(nombreMax), crearHojaArbol(nombreAux));
+									struct nodo *aumenta = crearNodoArbol("if", condicion, accion);
+									ListaP = crearNodoArbol("Lista", ListaP, aumenta);
+									push(stackLista, ListaP);
+									}
   | expresion					{
-	  								printf("Regla 54: LISTA_EXPRESION es expresion\n");
-									struct nodo * max = crearNodoArbol(":=", crearHojaArbol("@max"), ExpP);
-									struct nodo * aux = crearNodoArbol(":=", crearHojaArbol("@aux"), crearHojaArbol("-32767"));
-								    struct nodo *condicion = crearNodoArbol("<", max, aux);
-									struct nodo *accion = crearNodoArbol(":=", crearHojaArbol("@max"), crearHojaArbol("@aux"));
+	  								printf("Regla 54: LISTA_EXPRESION es expresion %d\n", contMaximoAnidado );
+									
+									//Genero el nombre de las variables auxiliares dinamicamente segun la cantidad de anidamientos de la funcion maximo
+									sprintf(nombreAux, "%s%d", "@aux", contMaximoAnidado);
+
+									sprintf(nombreMax, "%s%d", "@max", contMaximoAnidado);
+
+									agregarVarFloatATabla(nombreMax);
+									agregarVarFloatATabla(nombreAux);	
+									//no funciona el anidamiento por algun motivo, pone a todos con el mismo nombre
+									struct nodo *pMax = crearNodoArbol(":=", crearHojaArbol(nombreMax), ExpP);
+									struct nodo *pAux = crearNodoArbol(":=", crearHojaArbol(nombreAux), crearHojaArbol("-32767"));
+								    struct nodo *condicion = crearNodoArbol("<", pMax, pAux);
+									struct nodo *accion = crearNodoArbol(":=", crearHojaArbol(nombreMax), crearHojaArbol(nombreAux));
 									ListaP = crearNodoArbol("if", condicion, accion);
 									push(stackLista, ListaP);
-									
+									contMaximoAnidado++;									
 								}
 ;
 
@@ -654,7 +681,8 @@ int main(int argc,char *argv[])
 {
   if ((yyin = fopen(argv[1], "rt")) == NULL)
   {
-	  printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
+	  printf("\nERROR: No se puede abrir o crear el archivo: %s\n", argv[1]);
+	  return 1;
   }
   else
   {
@@ -770,6 +798,27 @@ void escribirNombreEnTabla(char* nombre, int pos){
 void agregarTiposDatosATabla(){
 	tabla_simbolo[varADeclarar1 + cantTipoDatoDeclarado].tipo_dato = tipoDatoADeclarar;
 }
+
+/** Agrega un nuevo nombre de variable a la tabla **/
+ void agregarVarFloatATabla(char* nombre){
+	 //Si se llena la tabla, sale por error
+	 if(fin_tabla >= TAMANIO_TABLA - 1){
+		 yyerror("No hay mas espacio en la tabla de simbolos");
+	 }
+	 //Si no existe en la tabla, lo agrega
+	 if(buscarEnTabla(nombre) == -1){
+		 fin_tabla++;
+		 //escribirNombreEnTabla(nombre, fin_tabla);
+		 strcpy(tabla_simbolo[fin_tabla].nombre, nombre);
+		 tabla_simbolo[fin_tabla].tipo_dato = Float;
+	 }
+	 else 
+	 {
+	  char msg[100] ;
+	  sprintf(msg,"'%s' ya se encuentra declarada previamente.", nombre);
+	  yyerror(msg);
+	}
+ }
 
 /** Guarda la tabla de simbolos en un archivo de texto */
 void guardarTabla(){
@@ -976,4 +1025,312 @@ void chequearVarEnTabla(char* nombre){
 		yyerror(msg);
 	}
 	//Si existe en la tabla, dejo que la compilacion siga
+}
+
+char* getCodigoOperacion(char* token)
+{
+	if(!strcmp(token, "+"))
+	{
+		return "FADD";
+	}
+	else if(!strcmp(token, ":="))
+	{
+		return "MOV";
+	}
+	else if(!strcmp(token, "-"))
+	{
+		return "FSUB";
+	}
+	else if(!strcmp(token, "*"))
+	{
+		return "FMUL";
+	}
+	else if(!strcmp(token, "/"))
+	{
+		return "FDIV";
+	}
+	/*else if(!strcmp(token, "PUT"))
+	{
+		return "DisplayString";
+	}
+	else if(!strcmp(token, "IN"))
+	{
+		return "DisplayString";
+	}*/
+	else if(!strcmp(token, "BNE"))
+	{
+		return "JNE";
+	}
+	else if(!strcmp(token, "BEQ"))
+	{
+		return "JE";
+	}
+	else if(!strcmp(token, "BGE"))
+	{
+		return "JNA";
+	}
+	else if(!strcmp(token, "BGT"))
+	{
+		return "JNAE";
+	}
+	else if(!strcmp(token, "BLE"))
+	{
+		return "JNB";
+	}
+	else if(!strcmp(token, "BLT"))
+	{
+		return "JNBE";
+	}
+	else if (!strcmp(token, "BI")) {
+		return "JMP";
+	}
+}
+
+void recorrerArbol(struct nodo *raiz){
+	//Recorro el arbol en post-orden
+
+	/*if (raiz == NULL)
+        return; 
+
+	recorrerArbol(raiz->left);
+	recorrerArbol(raiz->right);
+	
+	if(strcmp(raiz->valor, "WRITE")==0 ){	
+		char aux[50];
+		strcpy(aux, raiz->left->valor);
+
+		saca_comillas(aux);
+		quitarblancos(aux);
+
+		if(strcmpi(tabla_simbolo[buscarEnTablaSimbolo(aux)].tipo, "Int")==0)
+			fprintf(tasm,"displayFloat %s, 2\nnewline\n",guion_cadena(aux));	
+		else
+			fprintf(tasm,"LEA DX, %s\nMOV AH, 9\nINT 21H\nnewline\n",guion_cadena(aux));
+	}
+
+	if(strcmp(raiz->valor,"READ")==0)
+		fprintf(tasm,"GetFloat _%s, 2\n", raiz->left->valor);
+
+	if(strcmp(raiz->valor,"IF")==0){
+		if(strcmp(raiz->left->valor,"<")==0){
+			
+			if(strcmp(raiz->left->left->valor,"=")==0){
+				fprintf(tasm,"fld %s\n", guion_cadena(raiz->left->left->right->valor)); 
+				fprintf(tasm,"fstp %s\n", guion_cadena(raiz->left->left->left->valor)); 
+
+				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->left->left->valor));
+				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->right->valor));
+			}
+			else{
+				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->left->valor));
+				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->right->valor));
+			}
+
+			//fprintf(tasm,"fxch\n");
+			fprintf(tasm,"fcom\n");
+			fprintf(tasm,"fstsw AX\n");
+			fprintf(tasm,"sahf\n");
+			fprintf(tasm,"ffree\n");
+
+			fprintf(tasm,"JNAE @etiqueta%d\n",etiq);
+		}
+
+		if(strcmp(raiz->right->valor,"=")==0){
+			fprintf(tasm,"fld %s\n", guion_cadena(raiz->right->right->valor)); 
+			fprintf(tasm,"fstp %s\n", guion_cadena(raiz->right->left->valor)); 
+		}	
+
+		fprintf(tasm,"@etiqueta%d:\n",etiq);
+		etiq++;
+	}
+
+	if(strcmp(raiz->valor,"@igualsindiv")==0){
+		fprintf(tasm,"fld %s\n", guion_cadena(raiz->right->right->valor)); 
+		fprintf(tasm,"fstp %s\n", guion_cadena(raiz->right->left->valor)); 
+	}
+
+	if(strcmp(raiz->valor,"@igualdiv")==0){
+		fprintf(tasm,"fld %s\n", guion_cadena(raiz->right->right->left->valor));
+		fprintf(tasm, "fld %s\n", guion_cadena(raiz->right->right->right->valor));			
+		fprintf(tasm, "fdiv\n");			 
+		//fprintf(tasm,"fxch\n");
+		fprintf(tasm, "fstp %s\n", guion_cadena(raiz->left->valor));
+	}*/
+	printf("Recorre el arbol - borrar");
+}
+
+/*
+char *guion_cadena(char cad[TAM])
+{
+	char guion[TAM+1]="_" ;
+	strcat(guion,cad);
+	strcpy(cadena,guion);
+	return cadena;
+}
+*/
+char *quitarblancos(char *cad)
+{
+	
+    char *orig, *dest;
+    orig = cad;
+    dest = cad;
+
+    while(*orig)
+    {
+        while(esBlanco(*orig))
+        {
+            orig++;
+        }
+        if(*orig)
+        {
+            *dest = aMayusc(*orig);
+            orig++;
+            dest++;
+            while(*orig && !esBlanco(*orig))
+            {
+				if(*orig == ':')
+				{
+					orig++;
+				}
+				else
+				{
+                *dest = aMinusc(*orig);
+                orig++;
+                dest++;
+				}
+            }
+            if(esBlanco(*orig))
+            {
+               
+			   //*dest = ' ';
+                //dest++;
+            }
+        }
+    }
+    if(dest > cad && esBlanco(*(dest -1)))
+       {
+           dest--;
+       }
+       *dest = '\0';
+       return cad;
+}
+/*
+void saca_comillas(char *cadena){
+    char *paux=cadena;
+    char *paux2=cadena;
+	if(*paux != '\"')
+		return;
+
+    paux=strchr(paux,'\"');
+    paux++;
+
+    while (*paux!='\"'){
+        (*paux2)=(*paux);
+        paux++;
+        paux2++;
+    }
+
+    while (*paux2){
+        (*paux2)='\0'; 
+        paux2++;   
+    }
+  
+}
+
+
+char* getNombreAsm(char *nombreCteOId) {
+	char* nombreAsm = (char*) malloc(sizeof(char)*200);
+	nombreAsm[0] = '\0';
+	strcat(nombreAsm, "@"); // prefijo agregado
+	
+	int pos = nombre_existe_en_ts(nombreCteOId);
+	if (pos==-1) { //si no lo encuentro con el mismo nombre es porque debe ser cte		
+		char *nomCte = (char*) malloc(31*sizeof(char));
+		*nomCte = '\0';
+		strcat(nomCte, "_");
+		strcat(nomCte, nombreCteOId);
+	
+		char *original = nomCte;
+		while(*nomCte != '\0') {
+			if (*nomCte == ' ' || *nomCte == '"' || *nomCte == '!' 
+				|| *nomCte == '.') {
+				*nomCte = '_';
+			}
+			nomCte++;
+		}
+		nomCte = original;
+		strcat(nombreAsm, nomCte);
+	} else {
+		strcat(nombreAsm, nombreCteOId);
+	}
+	
+	return nombreAsm;
+}
+*/
+void generarAssembler(){
+	if( (tasm = fopen("Final.asm", "wt")) == NULL){
+		printf("\nERROR: No se puede abrir o crear el archivo: %s\n", "Final.asm");
+		exit(1);
+	}
+
+	//HEADER
+	fprintf(tasm,"include macros2.asm\n");
+	fprintf(tasm,"include number.asm\n\n");
+	//fprintf(tasm,"include numbers.asm\n\n");
+	fprintf(tasm,".MODEL LARGE\n.STACK 200h\n.386\n.387\n\n");
+
+	//DATA
+	fprintf(tasm,"MAXTEXTSIZE equ 30\n\n.DATA\n\n");
+
+	int i=0;
+	for(i=0;i<fin_tabla;i++) 
+	{
+		char sinEspacios[30];
+		switch (tabla_simbolo[i].tipo_dato){
+		case Float:
+			/*if (strncmp("_@aux", tabla_simbolo[i].nombre, 5) != 0) {
+				char aux[TAM+1];
+				sprintf(aux, "_%s", tabla_simbolo[i].nombre);
+				strcpy(tabla_simbolo[i].nombre, aux);
+			}*/
+			fprintf(tasm,"%-35s DD (?)\n", tabla_simbolo[i].nombre);
+			break;
+		case Integer:
+			fprintf(tasm,"%-35s DD (?)\n", tabla_simbolo[i].nombre);
+			break;
+		case String:
+			/*char aux[TAM+1];
+			sprintf(aux, "_%s", tabla_simbolo[i].nombre);
+			strcpy(tabla_simbolo[i].nombre, aux);*/
+			fprintf(tasm,"%-35s DB MAXTEXTSIZE dup (?)\n", tabla_simbolo[i].nombre);
+			break;
+		case CteReal:
+			fprintf(tasm,"%-35s DD %f\n",tabla_simbolo[i].nombre, tabla_simbolo[i].valor_f);
+			break;
+		case CteInt:
+			fprintf(tasm,"%-35s DD %d.00\n", tabla_simbolo[i].nombre, tabla_simbolo[i].valor_i);
+			break;
+		case CteString:
+			strcpy(sinEspacios, quitarblancos(tabla_simbolo[i].nombre));			
+			fprintf(tasm,"%-35s DB \"%-10s\",'$', %03d dup (?)\n", sinEspacios,  tabla_simbolo[i].valor_s,tabla_simbolo[i].longitud);
+			break;
+    	case CteBinaria:
+			fprintf(tasm,"%-35s DD %d.00\n", tabla_simbolo[i].nombre, tabla_simbolo[i].valor_i);
+			break;
+    	case CteHexa:
+			fprintf(tasm,"%-35s DD %d.00\n", tabla_simbolo[i].nombre, tabla_simbolo[i].valor_i);
+			break;
+		}			
+	}
+
+	fprintf(tasm,"\n");
+
+	//CODE
+	fprintf(tasm,".CODE\n\nSTART:\nMOV AX, @DATA\nMOV DS,AX\nFINIT\nFFREE\n\n");
+
+	//recorrerArbol(PunteroS);
+
+	//FOOTER
+	fprintf(tasm,"FINAL:\nmov ah, 1\nint 21h\nMOV AX, 4C00h\nINT 21h\nEND START");
+	fclose(tasm);
 }
