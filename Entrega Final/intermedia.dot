@@ -1,146 +1,291 @@
  digraph G { 
-"0074D470_BS"->"0074CDE0_BS" 
-"0074CDE0_BS"->"0074CF60_BS" 
-"0074CF60_BS"->"0074CD38_BS" 
-"0074CD38_BS"->"0074BD88_BS" 
-"0074BD88_BS"->"0074BCC8_BS" 
-"0074BCC8_BS"->"0074BCB0_BS" 
-"0074BCB0_BS"->"00748D28_BS" 
-"00748D28_BS"->"007416D8_IO" 
-"007416D8_IO"->"007416C0_out" 
-"007416D8_IO"->"007416A8_'Prueba.txt LyC Tema 2!'" 
-"00748D28_BS"->"00741748_IO" 
-"00741748_IO"->"00741730_out" 
-"00741748_IO"->"00741718_'Ing entero para actual: '" 
-"0074BCB0_BS"->"0074BE78_IO" 
-"0074BE78_IO"->"007404B0_in" 
-"0074BE78_IO"->"00748D40_actual" 
-"0074BCC8_BS"->"0074BE60_:=" 
-"0074BE60_:="->"0074BCF8_contador" 
-"0074BE60_:="->"0074BCE0_0" 
-"0074BD88_BS"->"0074BD70_:=" 
-"0074BD70_:="->"0074BD58_suma" 
-"0074BD70_:="->"0074BD40_+" 
-"0074BD40_+"->"0074BD10_02.5" 
-"0074BD40_+"->"0074BD28_0xA2B0" 
-"0074CD38_BS"->"0074CE70_while" 
-"0074CE70_while"->"0074BDB8_<=" 
-"0074BDB8_<="->"0074BDA0_contador" 
-"0074BDB8_<="->"0074BE18_9" 
-"0074CE70_while"->"0074CF48_BI" 
-"0074CF48_BI"->"0074CD68_BI" 
-"0074CD68_BI"->"0074C338_:=" 
-"0074C338_:="->"0074C488_contador" 
-"0074C338_:="->"0074C320_+" 
-"0074C320_+"->"0074BE00_contador" 
-"0074C320_+"->"0074C440_1" 
-"0074CD68_BI"->"0074CE88_:=" 
-"0074CE88_:="->"0074CCF0_actual" 
-"0074CE88_:="->"0074CE10_+" 
-"0074CE10_+"->"0074C398_/" 
-"0074C398_/"->"0074C4D0_contador" 
-"0074C398_/"->"0074C3F8_0.342" 
-"0074CE10_+"->"0074CE58_*" 
-"0074CE58_*"->"0074C3E0_contador" 
-"0074CE58_*"->"0074CED0_Lista" 
-"0074CED0_Lista"->"0074C6C8_Lista" 
-"0074C6C8_Lista"->"0074C608_Lista" 
-"0074C608_Lista"->"0074C4A0_if" 
-"0074C4A0_if"->"0074C5A8_<" 
-"0074C5A8_<"->"0074C410_:=" 
-"0074C410_:="->"0074C2F0_@max" 
-"0074C410_:="->"0074C590_*" 
-"0074C590_*"->"0074C380_actual" 
-"0074C590_*"->"0074C350_contador" 
-"0074C5A8_<"->"0074C3B0_:=" 
-"0074C3B0_:="->"0074C500_@aux" 
-"0074C3B0_:="->"0074C548_-32767" 
-"0074C4A0_if"->"0074C458_:=" 
-"0074C458_:="->"0074C428_@max" 
-"0074C458_:="->"0074C3C8_@aux" 
-"0074C608_Lista"->"0074C5D8_if" 
-"0074C5D8_if"->"0074C530_<" 
-"0074C530_<"->"0074C518_@max" 
-"0074C530_<"->"0074C4E8_:=" 
-"0074C4E8_:="->"0074C368_@aux" 
-"0074C4E8_:="->"0074C4B8_2" 
-"0074C5D8_if"->"0074C2C0_:=" 
-"0074C2C0_:="->"0074C578_@max" 
-"0074C2C0_:="->"0074C560_@aux" 
-"0074C6C8_Lista"->"0074C998_if" 
-"0074C998_if"->"0074C650_<" 
-"0074C650_<"->"0074C620_@max" 
-"0074C650_<"->"0074C680_:=" 
-"0074C680_:="->"0074C638_@aux" 
-"0074C680_:="->"0074C5F0_*" 
-"0074C5F0_*"->"0074C668_actual" 
-"0074C5F0_*"->"0074C5C0_suma" 
-"0074C998_if"->"0074C818_:=" 
-"0074C818_:="->"0074C8C0_@max" 
-"0074C818_:="->"0074C758_@aux" 
-"0074CED0_Lista"->"0074CD80_if" 
-"0074CD80_if"->"0074C9E0_<" 
-"0074C9E0_<"->"0074C9C8_@max" 
-"0074C9E0_<"->"0074CA40_:=" 
-"0074CA40_:="->"0074CA88_@aux" 
-"0074CA40_:="->"0074CA70_Lista" 
-"0074CA70_Lista"->"0074C890_Lista" 
-"0074C890_Lista"->"0074C7D0_if" 
-"0074C7D0_if"->"0074C968_<" 
-"0074C968_<"->"0074C8F0_:=" 
-"0074C8F0_:="->"0074C770_@max" 
-"0074C8F0_:="->"0074C8D8_4" 
-"0074C968_<"->"0074C980_:=" 
-"0074C980_:="->"0074C920_@aux" 
-"0074C980_:="->"0074C6E0_-32767" 
-"0074C7D0_if"->"0074C6F8_:=" 
-"0074C6F8_:="->"0074C800_@max" 
-"0074C6F8_:="->"0074C950_@aux" 
-"0074C890_Lista"->"0074C8A8_if" 
-"0074C8A8_if"->"0074C7E8_<" 
-"0074C7E8_<"->"0074C878_@max" 
-"0074C7E8_<"->"0074C9B0_:=" 
-"0074C9B0_:="->"0074C7A0_@aux" 
-"0074C9B0_:="->"0074C788_actual" 
-"0074C8A8_if"->"0074C938_:=" 
-"0074C938_:="->"0074C830_@max" 
-"0074C938_:="->"0074C7B8_@aux" 
-"0074CA70_Lista"->"0074CA28_if" 
-"0074CA28_if"->"0074C848_<" 
-"0074C848_<"->"0074C740_@max" 
-"0074C848_<"->"0074C728_:=" 
-"0074C728_:="->"0074C710_@aux" 
-"0074C728_:="->"0074C908_2" 
-"0074CA28_if"->"0074CA10_:=" 
-"0074CA10_:="->"0074CA58_@max" 
-"0074CA10_:="->"0074C860_@aux" 
-"0074CD80_if"->"0074CDB0_:=" 
-"0074CDB0_:="->"0074CDC8_@max" 
-"0074CDB0_:="->"0074C9F8_@aux" 
-"0074CF48_BI"->"0074CF30_:=" 
-"0074CF30_:="->"0074CF18_suma" 
-"0074CF30_:="->"0074CCD8_+" 
-"0074CCD8_+"->"0074CDF8_suma" 
-"0074CCD8_+"->"0074CF00_actual" 
-"0074CF60_BS"->"0074CD08_IO" 
-"0074CD08_IO"->"0074CEE8_out" 
-"0074CD08_IO"->"0074CE28_'La suma es: '" 
-"0074CDE0_BS"->"0074CF78_IO" 
-"0074CF78_IO"->"0074CD20_out" 
-"0074CF78_IO"->"0074CD98_suma" 
-"0074D470_BS"->"0074D4A0_if" 
-"0074D4A0_if"->"0074CEA0_>" 
-"0074CEA0_>"->"0074CF90_actual" 
-"0074CEA0_>"->"0074CE40_0b10" 
-"0074D4A0_if"->"0074D068_cuerpo" 
-"0074D068_cuerpo"->"0074CFC0_IO" 
-"0074CFC0_IO"->"0074CFA8_out" 
-"0074CFC0_IO"->"0074CEB8_'act es > 2 y != de cero'" 
-"0074D068_cuerpo"->"0074D050_if" 
-"0074D050_if"->"0074D038_<" 
-"0074D038_<"->"0074D080_actual" 
-"0074D038_<"->"0074CFD8_0b111010" 
-"0074D050_if"->"0074D008_IO" 
-"0074D008_IO"->"0074CFF0_out" 
-"0074D008_IO"->"0074D098_'no es mayor que 2'" 
+"00BED320_BS" [label="BS"]
+"00BECF30_BS" [label="BS"]
+"00BED320_BS"->"00BECF30_BS" 
+"00BECF18_BS" [label="BS"]
+"00BECF30_BS"->"00BECF18_BS" 
+"00BECFA8_BS" [label="BS"]
+"00BECF18_BS"->"00BECFA8_BS" 
+"00BEBDD0_BS" [label="BS"]
+"00BECFA8_BS"->"00BEBDD0_BS" 
+"00BEBCE0_BS" [label="BS"]
+"00BEBDD0_BS"->"00BEBCE0_BS" 
+"00BEBDB8_BS" [label="BS"]
+"00BEBCE0_BS"->"00BEBDB8_BS" 
+"00BE8D28_BS" [label="BS"]
+"00BEBDB8_BS"->"00BE8D28_BS" 
+"00BE16D8_IO" [label="IO"]
+"00BE8D28_BS"->"00BE16D8_IO" 
+"00BE16C0_out" [label="out"]
+"00BE16D8_IO"->"00BE16C0_out" 
+"00BE16A8_'Prueba.txt LyC Tema 2!'" [label="'Prueba.txt LyC Tema 2!'"]
+"00BE16D8_IO"->"00BE16A8_'Prueba.txt LyC Tema 2!'" 
+"00BE1748_IO" [label="IO"]
+"00BE8D28_BS"->"00BE1748_IO" 
+"00BE1730_out" [label="out"]
+"00BE1748_IO"->"00BE1730_out" 
+"00BE1718_'Ing entero para actual: '" [label="'Ing entero para actual: '"]
+"00BE1748_IO"->"00BE1718_'Ing entero para actual: '" 
+"00BEBD70_IO" [label="IO"]
+"00BEBDB8_BS"->"00BEBD70_IO" 
+"00BE04B0_in" [label="in"]
+"00BEBD70_IO"->"00BE04B0_in" 
+"00BE8D40_actual" [label="actual"]
+"00BEBD70_IO"->"00BE8D40_actual" 
+"00BEBCC8_:=" [label=":="]
+"00BEBCE0_BS"->"00BEBCC8_:=" 
+"00BEBCF8_contador" [label="contador"]
+"00BEBCC8_:="->"00BEBCF8_contador" 
+"00BEBCB0_0" [label="0"]
+"00BEBCC8_:="->"00BEBCB0_0" 
+"00BEBD28_:=" [label=":="]
+"00BEBDD0_BS"->"00BEBD28_:=" 
+"00BEBDA0_suma" [label="suma"]
+"00BEBD28_:="->"00BEBDA0_suma" 
+"00BEBE60_+" [label="+"]
+"00BEBD28_:="->"00BEBE60_+" 
+"00BEBD10_02.5" [label="02.5"]
+"00BEBE60_+"->"00BEBD10_02.5" 
+"00BEBD40_0xA2B0" [label="0xA2B0"]
+"00BEBE60_+"->"00BEBD40_0xA2B0" 
+"00BECE70_while" [label="while"]
+"00BECFA8_BS"->"00BECE70_while" 
+"00BEBE78_<=" [label="<="]
+"00BECE70_while"->"00BEBE78_<=" 
+"00BEBDE8_contador" [label="contador"]
+"00BEBE78_<="->"00BEBDE8_contador" 
+"00BEBE00_9" [label="9"]
+"00BEBE78_<="->"00BEBE00_9" 
+"00BECD80_BI" [label="BI"]
+"00BECE70_while"->"00BECD80_BI" 
+"00BECDC8_BI" [label="BI"]
+"00BECD80_BI"->"00BECDC8_BI" 
+"00BEC4B8_:=" [label=":="]
+"00BECDC8_BI"->"00BEC4B8_:=" 
+"00BEC410_contador" [label="contador"]
+"00BEC4B8_:="->"00BEC410_contador" 
+"00BEC338_+" [label="+"]
+"00BEC4B8_:="->"00BEC338_+" 
+"00BEBE48_contador" [label="contador"]
+"00BEC338_+"->"00BEBE48_contador" 
+"00BEC500_1" [label="1"]
+"00BEC338_+"->"00BEC500_1" 
+"00BECE28_:=" [label=":="]
+"00BECDC8_BI"->"00BECE28_:=" 
+"00BECF90_actual" [label="actual"]
+"00BECE28_:="->"00BECF90_actual" 
+"00BECED0_+" [label="+"]
+"00BECE28_:="->"00BECED0_+" 
+"00BEC530_/" [label="/"]
+"00BECED0_+"->"00BEC530_/" 
+"00BEC320_contador" [label="contador"]
+"00BEC530_/"->"00BEC320_contador" 
+"00BEC2C0_0.342" [label="0.342"]
+"00BEC530_/"->"00BEC2C0_0.342" 
+"00BECE10_*" [label="*"]
+"00BECED0_+"->"00BECE10_*" 
+"00BEC368_contador" [label="contador"]
+"00BECE10_*"->"00BEC368_contador" 
+"00BECDB0_Lista" [label="Lista"]
+"00BECE10_*"->"00BECDB0_Lista" 
+"00BEC8D8_Lista" [label="Lista"]
+"00BECDB0_Lista"->"00BEC8D8_Lista" 
+"00BEC608_Lista" [label="Lista"]
+"00BEC8D8_Lista"->"00BEC608_Lista" 
+"00BEC3E0_if" [label="if"]
+"00BEC608_Lista"->"00BEC3E0_if" 
+"00BEC4A0_<" [label="<"]
+"00BEC3E0_if"->"00BEC4A0_<" 
+"00BEC458_:=" [label=":="]
+"00BEC4A0_<"->"00BEC458_:=" 
+"00BEC4D0_@max" [label="@max"]
+"00BEC458_:="->"00BEC4D0_@max" 
+"00BEC2D8_*" [label="*"]
+"00BEC458_:="->"00BEC2D8_*" 
+"00BEC578_actual" [label="actual"]
+"00BEC2D8_*"->"00BEC578_actual" 
+"00BEC488_contador" [label="contador"]
+"00BEC2D8_*"->"00BEC488_contador" 
+"00BEC3B0_:=" [label=":="]
+"00BEC4A0_<"->"00BEC3B0_:=" 
+"00BEC440_@aux" [label="@aux"]
+"00BEC3B0_:="->"00BEC440_@aux" 
+"00BEC5A8_-32767" [label="-32767"]
+"00BEC3B0_:="->"00BEC5A8_-32767" 
+"00BEC350_:=" [label=":="]
+"00BEC3E0_if"->"00BEC350_:=" 
+"00BEC470_@max" [label="@max"]
+"00BEC350_:="->"00BEC470_@max" 
+"00BEC2F0_@aux" [label="@aux"]
+"00BEC350_:="->"00BEC2F0_@aux" 
+"00BEC5C0_if" [label="if"]
+"00BEC608_Lista"->"00BEC5C0_if" 
+"00BEC560_<" [label="<"]
+"00BEC5C0_if"->"00BEC560_<" 
+"00BEC590_@max" [label="@max"]
+"00BEC560_<"->"00BEC590_@max" 
+"00BEC548_:=" [label=":="]
+"00BEC560_<"->"00BEC548_:=" 
+"00BEC428_@aux" [label="@aux"]
+"00BEC548_:="->"00BEC428_@aux" 
+"00BEC518_2" [label="2"]
+"00BEC548_:="->"00BEC518_2" 
+"00BEC398_:=" [label=":="]
+"00BEC5C0_if"->"00BEC398_:=" 
+"00BEC380_@max" [label="@max"]
+"00BEC398_:="->"00BEC380_@max" 
+"00BEC308_@aux" [label="@aux"]
+"00BEC398_:="->"00BEC308_@aux" 
+"00BEC968_if" [label="if"]
+"00BEC8D8_Lista"->"00BEC968_if" 
+"00BEC5F0_<" [label="<"]
+"00BEC968_if"->"00BEC5F0_<" 
+"00BEC668_@max" [label="@max"]
+"00BEC5F0_<"->"00BEC668_@max" 
+"00BEC638_:=" [label=":="]
+"00BEC5F0_<"->"00BEC638_:=" 
+"00BEC650_@aux" [label="@aux"]
+"00BEC638_:="->"00BEC650_@aux" 
+"00BEC5D8_*" [label="*"]
+"00BEC638_:="->"00BEC5D8_*" 
+"00BEC620_actual" [label="actual"]
+"00BEC5D8_*"->"00BEC620_actual" 
+"00BEC680_suma" [label="suma"]
+"00BEC5D8_*"->"00BEC680_suma" 
+"00BEC818_:=" [label=":="]
+"00BEC968_if"->"00BEC818_:=" 
+"00BEC920_@max" [label="@max"]
+"00BEC818_:="->"00BEC920_@max" 
+"00BEC8F0_@aux" [label="@aux"]
+"00BEC818_:="->"00BEC8F0_@aux" 
+"00BECEE8_if" [label="if"]
+"00BECDB0_Lista"->"00BECEE8_if" 
+"00BECA40_<" [label="<"]
+"00BECEE8_if"->"00BECA40_<" 
+"00BEC9F8_@max" [label="@max"]
+"00BECA40_<"->"00BEC9F8_@max" 
+"00BEC9E0_:=" [label=":="]
+"00BECA40_<"->"00BEC9E0_:=" 
+"00BEC9C8_@aux" [label="@aux"]
+"00BEC9E0_:="->"00BEC9C8_@aux" 
+"00BECA28_Lista" [label="Lista"]
+"00BEC9E0_:="->"00BECA28_Lista" 
+"00BEC7A0_Lista" [label="Lista"]
+"00BECA28_Lista"->"00BEC7A0_Lista" 
+"00BEC980_if" [label="if"]
+"00BEC7A0_Lista"->"00BEC980_if" 
+"00BEC728_<" [label="<"]
+"00BEC980_if"->"00BEC728_<" 
+"00BEC938_:=" [label=":="]
+"00BEC728_<"->"00BEC938_:=" 
+"00BEC908_@max" [label="@max"]
+"00BEC938_:="->"00BEC908_@max" 
+"00BEC758_4" [label="4"]
+"00BEC938_:="->"00BEC758_4" 
+"00BEC9B0_:=" [label=":="]
+"00BEC728_<"->"00BEC9B0_:=" 
+"00BEC950_@aux" [label="@aux"]
+"00BEC9B0_:="->"00BEC950_@aux" 
+"00BEC7E8_-32767" [label="-32767"]
+"00BEC9B0_:="->"00BEC7E8_-32767" 
+"00BEC740_:=" [label=":="]
+"00BEC980_if"->"00BEC740_:=" 
+"00BEC788_@max" [label="@max"]
+"00BEC740_:="->"00BEC788_@max" 
+"00BEC6C8_@aux" [label="@aux"]
+"00BEC740_:="->"00BEC6C8_@aux" 
+"00BEC800_if" [label="if"]
+"00BEC7A0_Lista"->"00BEC800_if" 
+"00BEC998_<" [label="<"]
+"00BEC800_if"->"00BEC998_<" 
+"00BEC830_@max" [label="@max"]
+"00BEC998_<"->"00BEC830_@max" 
+"00BEC6E0_:=" [label=":="]
+"00BEC998_<"->"00BEC6E0_:=" 
+"00BEC8C0_@aux" [label="@aux"]
+"00BEC6E0_:="->"00BEC8C0_@aux" 
+"00BEC848_actual" [label="actual"]
+"00BEC6E0_:="->"00BEC848_actual" 
+"00BEC710_:=" [label=":="]
+"00BEC800_if"->"00BEC710_:=" 
+"00BEC770_@max" [label="@max"]
+"00BEC710_:="->"00BEC770_@max" 
+"00BEC6F8_@aux" [label="@aux"]
+"00BEC710_:="->"00BEC6F8_@aux" 
+"00BECA88_if" [label="if"]
+"00BECA28_Lista"->"00BECA88_if" 
+"00BEC890_<" [label="<"]
+"00BECA88_if"->"00BEC890_<" 
+"00BEC878_@max" [label="@max"]
+"00BEC890_<"->"00BEC878_@max" 
+"00BEC7D0_:=" [label=":="]
+"00BEC890_<"->"00BEC7D0_:=" 
+"00BEC860_@aux" [label="@aux"]
+"00BEC7D0_:="->"00BEC860_@aux" 
+"00BEC7B8_2" [label="2"]
+"00BEC7D0_:="->"00BEC7B8_2" 
+"00BECA70_:=" [label=":="]
+"00BECA88_if"->"00BECA70_:=" 
+"00BECA58_@max" [label="@max"]
+"00BECA70_:="->"00BECA58_@max" 
+"00BEC8A8_@aux" [label="@aux"]
+"00BECA70_:="->"00BEC8A8_@aux" 
+"00BECD68_:=" [label=":="]
+"00BECEE8_if"->"00BECD68_:=" 
+"00BECF78_@max" [label="@max"]
+"00BECD68_:="->"00BECF78_@max" 
+"00BECA10_@aux" [label="@aux"]
+"00BECD68_:="->"00BECA10_@aux" 
+"00BECE58_:=" [label=":="]
+"00BECD80_BI"->"00BECE58_:=" 
+"00BECDF8_suma" [label="suma"]
+"00BECE58_:="->"00BECDF8_suma" 
+"00BECD50_+" [label="+"]
+"00BECE58_:="->"00BECD50_+" 
+"00BECDE0_suma" [label="suma"]
+"00BECD50_+"->"00BECDE0_suma" 
+"00BECE40_actual" [label="actual"]
+"00BECD50_+"->"00BECE40_actual" 
+"00BECF00_IO" [label="IO"]
+"00BECF18_BS"->"00BECF00_IO" 
+"00BECE88_out" [label="out"]
+"00BECF00_IO"->"00BECE88_out" 
+"00BECF48_'La suma es: '" [label="'La suma es: '"]
+"00BECF00_IO"->"00BECF48_'La suma es: '" 
+"00BECCD8_IO" [label="IO"]
+"00BECF30_BS"->"00BECCD8_IO" 
+"00BECFC0_out" [label="out"]
+"00BECCD8_IO"->"00BECFC0_out" 
+"00BECCF0_suma" [label="suma"]
+"00BECCD8_IO"->"00BECCF0_suma" 
+"00BED290_if" [label="if"]
+"00BED320_BS"->"00BED290_if" 
+"00BECD98_>" [label=">"]
+"00BED290_if"->"00BECD98_>" 
+"00BECD08_actual" [label="actual"]
+"00BECD98_>"->"00BECD08_actual" 
+"00BECD20_0b10" [label="0b10"]
+"00BECD98_>"->"00BECD20_0b10" 
+"00BED008_cuerpo" [label="cuerpo"]
+"00BED290_if"->"00BED008_cuerpo" 
+"00BECEB8_IO" [label="IO"]
+"00BED008_cuerpo"->"00BECEB8_IO" 
+"00BECEA0_out" [label="out"]
+"00BECEB8_IO"->"00BECEA0_out" 
+"00BECD38_'act es > 2 y != de cero'" [label="'act es > 2 y != de cero'"]
+"00BECEB8_IO"->"00BECD38_'act es > 2 y != de cero'" 
+"00BED050_if" [label="if"]
+"00BED008_cuerpo"->"00BED050_if" 
+"00BED020_<" [label="<"]
+"00BED050_if"->"00BED020_<" 
+"00BED068_actual" [label="actual"]
+"00BED020_<"->"00BED068_actual" 
+"00BECFF0_0b111010" [label="0b111010"]
+"00BED020_<"->"00BECFF0_0b111010" 
+"00BECFD8_IO" [label="IO"]
+"00BED050_if"->"00BECFD8_IO" 
+"00BED098_out" [label="out"]
+"00BECFD8_IO"->"00BED098_out" 
+"00BED038_'no es mayor que 2'" [label="'no es mayor que 2'"]
+"00BECFD8_IO"->"00BED038_'no es mayor que 2'" 
 }
