@@ -142,6 +142,7 @@
 	int cantVarsADeclarar = 0;
 	int cantTipoDatoDeclarado = 0;
 	int tipoDatoADeclarar;
+	int contador = 0;
 
 %}
 
@@ -548,14 +549,20 @@ void crearArchivoDot(struct nodo * raiz){
 /*Agrega nodo a .dot*/
 void addDot (struct nodo *raiz) {	
   if (raiz == NULL) return;
+  if (contador == 0) {
+	  fprintf(archIntermedia, "\"%p_%s\" [label=\"%s\"]\n",raiz,raiz->valor,raiz->valor);
+	  contador++;
+  }
   char* valor;
 	if (raiz -> left != NULL){
     	valor = strReplace("\"", "'", raiz->left->valor);
+		fprintf(archIntermedia, "\"%p_%s\" [label=\"%s\"]\n",raiz->left,valor,valor);
 		fprintf(archIntermedia, "\"%p_%s\"->\"%p_%s\" \n",raiz,raiz->valor, raiz->left,valor);
     	addDot(raiz->left);
 	}
 	if (raiz -> right != NULL){
     	valor = strReplace("\"", "'", raiz->right->valor);
+		fprintf(archIntermedia, "\"%p_%s\" [label=\"%s\"]\n",raiz->right,valor,valor);
 		fprintf(archIntermedia, "\"%p_%s\"->\"%p_%s\" \n",raiz,raiz->valor, raiz->right,valor);
 		addDot(raiz->right);
 	}
