@@ -39,8 +39,9 @@
 	#define TAM_NOMBRE 32
 
 	#define esBlanco(x) ((x) == ' ' || (x) == '\t' ? 1:0)
-	#define aMayusc(x) ((x) > 'a' && (x) < 'z' ? (x)-32 : (x))
-	#define aMinusc(x) ((x) > 'A' && (x) < 'Z' ? (x)+32 : (x))
+	#define esCaracterRaro(x) ((x) == '.' || (x) == '!' || (x) == '?' || (x) == '>' || (x) == '<' || (x) == '=' ? 1:0)
+	//#define aMayusc(x) ((x) > 'a' && (x) < 'z' ? (x)-32 : (x))
+	//#define aMinusc(x) ((x) > 'A' && (x) < 'Z' ? (x)+32 : (x))
 
 	int yylex();
 	
@@ -115,6 +116,7 @@
 	void agregarVarATabla(char* nombre);
 	void agregarVarFloatATabla(char* nombre);
 	void agregarTiposDatosATabla(void);
+	char *sacarComillas(char* str);
 	void agregarCteStringATabla(char* str);
 	void agregarCteIntATabla(int valor);
 	void agregarCteRealATabla(float valor);
@@ -124,8 +126,9 @@
 	int buscarEnTabla(char * name);
 	void escribirNombreEnTabla(char* nombre, int pos);
 	void guardarTabla(void);
-	void recorrerArbol(struct nodo *raiz);
-	char *quitarblancos(char *cad);
+	char *quitarblancosYcaracterRaro(char *cad);
+	char* obtenerNombreAsm(char* nombre);
+	void recorrerArbol(struct nodo *nodo);
 	void generarAssembler(void);
 
 	int yystopparser=0;
@@ -871,6 +874,17 @@ void guardarTabla(){
 	fclose(arch);
 }
 
+char *sacarComillas(char* str){
+	int length = strlen(str);
+	char auxiliar[length];
+	strcpy(auxiliar,str);
+	auxiliar[strlen(auxiliar)-1] = '\0';
+
+	//Queda en auxiliar el valor SIN COMILLAS
+	strcpy(str, auxiliar+1);
+	return str;
+}
+
 /** Agrega una constante string a la tabla de simbolos */
 void agregarCteStringATabla(char* str){
 	if(fin_tabla >= TAMANIO_TABLA - 1){
@@ -1049,126 +1063,9 @@ char* getCodigoOperacion(char* token)
 	{
 		return "FDIV";
 	}
-	/*else if(!strcmp(token, "PUT"))
-	{
-		return "DisplayString";
-	}
-	else if(!strcmp(token, "IN"))
-	{
-		return "DisplayString";
-	}*/
-	else if(!strcmp(token, "BNE"))
-	{
-		return "JNE";
-	}
-	else if(!strcmp(token, "BEQ"))
-	{
-		return "JE";
-	}
-	else if(!strcmp(token, "BGE"))
-	{
-		return "JNA";
-	}
-	else if(!strcmp(token, "BGT"))
-	{
-		return "JNAE";
-	}
-	else if(!strcmp(token, "BLE"))
-	{
-		return "JNB";
-	}
-	else if(!strcmp(token, "BLT"))
-	{
-		return "JNBE";
-	}
-	else if (!strcmp(token, "BI")) {
-		return "JMP";
-	}
 }
 
-void recorrerArbol(struct nodo *raiz){
-	//Recorro el arbol en post-orden
-
-	/*if (raiz == NULL)
-        return; 
-
-	recorrerArbol(raiz->left);
-	recorrerArbol(raiz->right);
-	
-	if(strcmp(raiz->valor, "WRITE")==0 ){	
-		char aux[50];
-		strcpy(aux, raiz->left->valor);
-
-		saca_comillas(aux);
-		quitarblancos(aux);
-
-		if(strcmpi(tabla_simbolo[buscarEnTablaSimbolo(aux)].tipo, "Int")==0)
-			fprintf(tasm,"displayFloat %s, 2\nnewline\n",guion_cadena(aux));	
-		else
-			fprintf(tasm,"LEA DX, %s\nMOV AH, 9\nINT 21H\nnewline\n",guion_cadena(aux));
-	}
-
-	if(strcmp(raiz->valor,"READ")==0)
-		fprintf(tasm,"GetFloat _%s, 2\n", raiz->left->valor);
-
-	if(strcmp(raiz->valor,"IF")==0){
-		if(strcmp(raiz->left->valor,"<")==0){
-			
-			if(strcmp(raiz->left->left->valor,"=")==0){
-				fprintf(tasm,"fld %s\n", guion_cadena(raiz->left->left->right->valor)); 
-				fprintf(tasm,"fstp %s\n", guion_cadena(raiz->left->left->left->valor)); 
-
-				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->left->left->valor));
-				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->right->valor));
-			}
-			else{
-				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->left->valor));
-				fprintf(tasm,"fld %s\n",guion_cadena(raiz->left->right->valor));
-			}
-
-			//fprintf(tasm,"fxch\n");
-			fprintf(tasm,"fcom\n");
-			fprintf(tasm,"fstsw AX\n");
-			fprintf(tasm,"sahf\n");
-			fprintf(tasm,"ffree\n");
-
-			fprintf(tasm,"JNAE @etiqueta%d\n",etiq);
-		}
-
-		if(strcmp(raiz->right->valor,"=")==0){
-			fprintf(tasm,"fld %s\n", guion_cadena(raiz->right->right->valor)); 
-			fprintf(tasm,"fstp %s\n", guion_cadena(raiz->right->left->valor)); 
-		}	
-
-		fprintf(tasm,"@etiqueta%d:\n",etiq);
-		etiq++;
-	}
-
-	if(strcmp(raiz->valor,"@igualsindiv")==0){
-		fprintf(tasm,"fld %s\n", guion_cadena(raiz->right->right->valor)); 
-		fprintf(tasm,"fstp %s\n", guion_cadena(raiz->right->left->valor)); 
-	}
-
-	if(strcmp(raiz->valor,"@igualdiv")==0){
-		fprintf(tasm,"fld %s\n", guion_cadena(raiz->right->right->left->valor));
-		fprintf(tasm, "fld %s\n", guion_cadena(raiz->right->right->right->valor));			
-		fprintf(tasm, "fdiv\n");			 
-		//fprintf(tasm,"fxch\n");
-		fprintf(tasm, "fstp %s\n", guion_cadena(raiz->left->valor));
-	}*/
-	printf("Recorre el arbol - borrar");
-}
-
-/*
-char *guion_cadena(char cad[TAM])
-{
-	char guion[TAM+1]="_" ;
-	strcat(guion,cad);
-	strcpy(cadena,guion);
-	return cadena;
-}
-*/
-char *quitarblancos(char *cad)
+char *quitarblancosYcaracterRaro(char *cad)
 {
 	
     char *orig, *dest;
@@ -1183,9 +1080,6 @@ char *quitarblancos(char *cad)
         }
         if(*orig)
         {
-            *dest = aMayusc(*orig);
-            orig++;
-            dest++;
             while(*orig && !esBlanco(*orig))
             {
 				if(*orig == ':')
@@ -1194,16 +1088,15 @@ char *quitarblancos(char *cad)
 				}
 				else
 				{
-                *dest = aMinusc(*orig);
-                orig++;
-                dest++;
+					if(esCaracterRaro(*orig)){
+						orig++;
+					}
+					else{
+						*dest = *orig;
+						orig++;
+						dest++;
+					}
 				}
-            }
-            if(esBlanco(*orig))
-            {
-               
-			   //*dest = ' ';
-                //dest++;
             }
         }
     }
@@ -1214,59 +1107,70 @@ char *quitarblancos(char *cad)
        *dest = '\0';
        return cad;
 }
-/*
-void saca_comillas(char *cadena){
-    char *paux=cadena;
-    char *paux2=cadena;
-	if(*paux != '\"')
-		return;
 
-    paux=strchr(paux,'\"');
-    paux++;
-
-    while (*paux!='\"'){
-        (*paux2)=(*paux);
-        paux++;
-        paux2++;
-    }
-
-    while (*paux2){
-        (*paux2)='\0'; 
-        paux2++;   
-    }
-  
+char* obtenerNombreAsm(char* nombre){
+	strcpy(nombre, sacarComillas(nombre));
+	strcpy(nombre, quitarblancosYcaracterRaro(nombre));
+	char auxNombre[31]= "_";
+	strcat(auxNombre, nombre);
+	strcpy(nombre, auxNombre);
+	return nombre;
 }
+void recorrerArbol(struct nodo *nodo){
+	//Recorro el arbol en post-orden
 
+	if (nodo == NULL)
+        return; 
 
-char* getNombreAsm(char *nombreCteOId) {
-	char* nombreAsm = (char*) malloc(sizeof(char)*200);
-	nombreAsm[0] = '\0';
-	strcat(nombreAsm, "@"); // prefijo agregado
-	
-	int pos = nombre_existe_en_ts(nombreCteOId);
-	if (pos==-1) { //si no lo encuentro con el mismo nombre es porque debe ser cte		
-		char *nomCte = (char*) malloc(31*sizeof(char));
-		*nomCte = '\0';
-		strcat(nomCte, "_");
-		strcat(nomCte, nombreCteOId);
-	
-		char *original = nomCte;
-		while(*nomCte != '\0') {
-			if (*nomCte == ' ' || *nomCte == '"' || *nomCte == '!' 
-				|| *nomCte == '.') {
-				*nomCte = '_';
+	recorrerArbol(nodo->left);
+	recorrerArbol(nodo->right);
+	if (strcmp(nodo->valor, "IO")==0 ) {	
+		if (strcmp(nodo->left->valor, "out")==0 ){
+			char nombre[30];
+			strcpy(nombre, nodo->right->valor);
+			int posAux = buscarEnTabla(nombre);
+			if(posAux == -1){ //si no lo encuentra es porque es una cte 
+				strcpy(nombre, obtenerNombreAsm(nombre));
+				posAux = buscarEnTabla(nombre); //lo busco de nuevo con el nombre correcto
 			}
-			nomCte++;
+
+			switch (tabla_simbolo[posAux].tipo_dato){
+			case Float:
+				fprintf(tasm,"displayFloat %s,2\n", nombre);
+				break;
+			case Integer:
+				fprintf(tasm,"displayFloat %s,2\n", nombre);
+				break;
+			case String:
+				fprintf(tasm,"displayString %s\n",nombre);
+				break;
+			case CteString:			
+				fprintf(tasm,"displayString %s\n", nombre);
+				break;
+			}	
+			fprintf(tasm, "newLine\n");
 		}
-		nomCte = original;
-		strcat(nombreAsm, nomCte);
-	} else {
-		strcat(nombreAsm, nombreCteOId);
+		if(strcmp(nodo->left->valor, "in")==0 ){	
+			//ingreso dato por pantalla
+			char nombre[30];
+			strcpy(nombre, nodo->right->valor);
+			int posAux = buscarEnTabla(nombre); //solo es id, asique tiene que encontrarlo
+
+			switch (tabla_simbolo[posAux].tipo_dato){
+			case Float:
+				fprintf(tasm,"GetFloat %s\n", nombre);
+				break;
+			case Integer:
+				fprintf(tasm,"GetFloat %s\n", nombre);
+				break;
+			case String:
+				fprintf(tasm,"GetString %s\n",nombre);
+				break;
+			}
+		}
 	}
-	
-	return nombreAsm;
 }
-*/
+
 void generarAssembler(){
 	if( (tasm = fopen("Final.asm", "wt")) == NULL){
 		printf("\nERROR: No se puede abrir o crear el archivo: %s\n", "Final.asm");
@@ -1288,30 +1192,24 @@ void generarAssembler(){
 		char sinEspacios[30];
 		switch (tabla_simbolo[i].tipo_dato){
 		case Float:
-			/*if (strncmp("_@aux", tabla_simbolo[i].nombre, 5) != 0) {
-				char aux[TAM+1];
-				sprintf(aux, "_%s", tabla_simbolo[i].nombre);
-				strcpy(tabla_simbolo[i].nombre, aux);
-			}*/
+
 			fprintf(tasm,"%-35s DD (?)\n", tabla_simbolo[i].nombre);
 			break;
 		case Integer:
 			fprintf(tasm,"%-35s DD (?)\n", tabla_simbolo[i].nombre);
 			break;
 		case String:
-			/*char aux[TAM+1];
-			sprintf(aux, "_%s", tabla_simbolo[i].nombre);
-			strcpy(tabla_simbolo[i].nombre, aux);*/
 			fprintf(tasm,"%-35s DB MAXTEXTSIZE dup (?)\n", tabla_simbolo[i].nombre);
 			break;
 		case CteReal:
-			fprintf(tasm,"%-35s DD %f\n",tabla_simbolo[i].nombre, tabla_simbolo[i].valor_f);
+			strcpy(sinEspacios, quitarblancosYcaracterRaro(tabla_simbolo[i].nombre));	
+			fprintf(tasm,"%-35s DD %f\n",sinEspacios, tabla_simbolo[i].valor_f);
 			break;
 		case CteInt:
 			fprintf(tasm,"%-35s DD %d.00\n", tabla_simbolo[i].nombre, tabla_simbolo[i].valor_i);
 			break;
 		case CteString:
-			strcpy(sinEspacios, quitarblancos(tabla_simbolo[i].nombre));			
+			strcpy(sinEspacios, quitarblancosYcaracterRaro(tabla_simbolo[i].nombre));			
 			fprintf(tasm,"%-35s DB \"%-10s\",'$', %03d dup (?)\n", sinEspacios,  tabla_simbolo[i].valor_s,tabla_simbolo[i].longitud);
 			break;
     	case CteBinaria:
@@ -1328,7 +1226,7 @@ void generarAssembler(){
 	//CODE
 	fprintf(tasm,".CODE\n\nSTART:\nMOV AX, @DATA\nMOV DS,AX\nFINIT\nFFREE\n\n");
 
-	//recorrerArbol(PunteroS);
+	recorrerArbol(raiz);
 
 	//FOOTER
 	fprintf(tasm,"FINAL:\nmov ah, 1\nint 21h\nMOV AX, 4C00h\nINT 21h\nEND START");
